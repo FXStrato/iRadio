@@ -4,6 +4,7 @@ import {Row, Col} from 'react-materialize';
 import {RaisedButton, FlatButton, Dialog, TextField, List, ListItem, AppBar} from 'material-ui';
 import _ from 'lodash';
 import Search from './Search';
+import ytDurationFormat from 'youtube-duration-format';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
@@ -13,7 +14,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchResults: []
+      results: [],
+      durations: []
     };
     this.searchCallback = this.searchCallback.bind(this);
     this.handleSearchSelect = this.handleSearchSelect.bind(this);
@@ -23,9 +25,22 @@ class App extends Component {
     console.log(ytURL + elem);
   }
 
-  searchCallback = results => {
-    console.log(results);
-    let content = _.map(results, elem => {
+  searchCallback = (results, durations) => {
+    this.setState({results: results});
+    console.log('results', results);
+    this.setState({durations: []});
+    for(let i = 0; i < durations.length; i++) {
+      durations[i].then(data => {
+        let temp = this.state.durations;
+        temp.push(ytDurationFormat(data.items[0].contentDetails.duration));
+        this.setState({durations: temp});
+      });
+    }
+  }
+
+  render() {
+
+    let content = _.map(this.state.results, (elem, index) => {
       return <ListItem
         onTouchTap={() => this.handleSearchSelect(elem.id.videoId)}
         style={{overflow: 'hidden'}}
@@ -33,15 +48,11 @@ class App extends Component {
         key={elem.id.videoId}
         leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px'}} src={elem.snippet.thumbnails.default.url} alt={elem.id.videoId}/>}
         primaryText={<div style={{paddingTop: '20px'}}>{elem.snippet.title}</div>}
-        secondaryText={elem.snippet.description}
+        secondaryText={this.state.durations[index] ? elem.snippet.channelTitle + ' | ' + this.state.durations[index] : elem.snippet.channelTitle + ' | Loading...'}
+        secondaryTextLines={2}
       />
     });
-    this.setState({searchResults: content});
-  }
 
-
-
-  render() {
     return (
       <div>
         <header>
@@ -61,7 +72,7 @@ class App extends Component {
               <Col s={12}>
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
                   <List style={{height: '600px', overflowY:'auto'}}>
-                    {this.state.searchResults}
+                    {content}
                   </List>
                 </MuiThemeProvider>
               </Col>

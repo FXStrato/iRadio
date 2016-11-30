@@ -19,6 +19,7 @@
     "react-router": "^3.0.0",
     "react-tap-event-plugin": "^2.0.1",
     "react-time": "^4.2.0",
+    "youtube-duration-format": "^0.2.0",
     "youtube-finder": "^1.0.0"
   },
   "scripts": {

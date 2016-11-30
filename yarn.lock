@@ -5651,6 +5651,10 @@ yargs@~3.10.0:
     decamelize "^1.0.0"
     window-size "0.1.0"
 
+youtube-duration-format@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/youtube-duration-format/-/youtube-duration-format-0.2.0.tgz#5a32d5ad7354bd9bf9c70bd78558ca70328d9fe2"
+
 youtube-finder@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/youtube-finder/-/youtube-finder-1.0.0.tgz#12127463b20e53c19b1200c3b1898a088be5071c"
