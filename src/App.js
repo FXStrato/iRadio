@@ -21,10 +21,12 @@ class App extends Component {
     this.handleSearchSelect = this.handleSearchSelect.bind(this);
   }
 
+  //This gets called upon clicking a list item. Can add more parameters to pass in more things.
   handleSearchSelect = elem => {
     console.log(ytURL + elem);
   }
 
+  //Search callback. Assigns results and durations to state.
   searchCallback = (results, durations) => {
     this.setState({results: results});
     console.log('results', results);
@@ -40,6 +42,8 @@ class App extends Component {
 
   render() {
 
+    //Renders search results. Durations will render when they are ready, maybe should have them not clickable until durations are shown to make sure durations
+    //can be passed in as well to onTouchTap
     let content = _.map(this.state.results, (elem, index) => {
       return <ListItem
         onTouchTap={() => this.handleSearchSelect(elem.id.videoId)}
