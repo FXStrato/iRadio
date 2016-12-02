@@ -20,7 +20,7 @@ class App extends Component {
   //Callback to handle search results
   searchCallback = (id, duration, thumbnail) => {
     console.log(id);
-
+  }
 
   render() {
 
