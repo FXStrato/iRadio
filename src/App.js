@@ -17,9 +17,10 @@ class App extends Component {
     this.searchCallback = this.searchCallback.bind(this);
   }
 
+  //Callback to handle search results
   searchCallback = (id, duration, thumbnail) => {
     console.log(id);
-  }
+
 
   render() {
 

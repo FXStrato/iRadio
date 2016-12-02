@@ -31,6 +31,7 @@ class Search extends Component {
     }
   }
 
+  //Populating the auto complete list, searching google's query results.
   performSearch() {
     const
       self = this,
@@ -55,6 +56,7 @@ class Search extends Component {
     }
   }
 
+  //Upon input, perform the search function
   onUpdateInput(inputValue) {
     const self = this;
 
@@ -65,6 +67,7 @@ class Search extends Component {
     });
   }
 
+  //Upon submitting request, search youtube, and return search results.
   onNewRequest(searchTerm) {
     this.setState({finished: false});
     document.querySelector('#list-progress').style.display = 'inline-block';
@@ -87,6 +90,7 @@ class Search extends Component {
     });
   }
 
+  //Upon obtaining list of promises, return the youtube search results and promises for each result containing duration
   getDurations = items => {
     //This currently only gives me promises
     let temp = _.map(items, elem => {
