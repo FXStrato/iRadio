@@ -1,10 +1,8 @@
 /*eslint no-unused-vars: "off"*/ //don't show warnings for unused
 import React, { Component } from 'react';
-<<<<<<< HEAD
 import logo from './logo.svg';
 import './App.css';
-import Queue from './Queue';
-=======
+import Queue from './SongList';
 import {Row, Col} from 'react-materialize';
 import {RaisedButton, FlatButton, Dialog, TextField, List, ListItem, AppBar} from 'material-ui';
 import _ from 'lodash';
@@ -14,7 +12,6 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 const ytURL = 'https://www.youtube.com/watch?v=';
->>>>>>> remotes/origin/search
 
 class App extends Component {
   constructor(props) {
@@ -64,14 +61,6 @@ class App extends Component {
     });
 
     return (
-<<<<<<< HEAD
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-          <Queue />
-        </div>
-=======
       <div>
         <header>
           <MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -96,11 +85,10 @@ class App extends Component {
               </Col>
             </Col>
           </Row>
+          <Queue />
         </main>
         <footer>
-
         </footer>
->>>>>>> remotes/origin/search
       </div>
     );
   }
