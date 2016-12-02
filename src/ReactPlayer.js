@@ -13,11 +13,10 @@ class RadioPlayer extends React.Component {
     this.state =
       {
         isPlaying: false,
-        localQueue: []
+        localQueue: [],
+        played: 0
       };
-
   }
-
 
   handlePlayPauseClick = event => {
     console.log("I've been clicked! -- Play Pause");
@@ -26,23 +25,45 @@ class RadioPlayer extends React.Component {
     this.setState({isPlaying: togglePlaying});
   }
 
-  handleForwardClick(event) {
+  handleForwardClick = event => {
     console.log("I've been clicked! -- Forward");
   }
 
-  handleBackwardClick(event) {
+  handleBackwardClick = event => {
     console.log("I've been clicked! -- Backward");
   }
 
-  handleRepeatClick(event) {
-    console.log("I've been clicked! -- Repeat");
+  handleRepeatClick = () => {
+    var toggleRepeating = !this.state.isRepeating;
+    this.setState({loop:toggleRepeating});
   }
 
+  onProgress = state => {
+    // We only want to update time slider if we are not currently seeking
+    if (!this.state.seeking) {
+      console.log("progress");
+      console.log(state);
+      this.setState(state);
+    }
+  }
+
+  onDuration = state => {
+    // We only want to update time slider if we are not currently seeking
+    if (!this.state.seeking) {
+      console.log("duration:");
+      console.log(state);
+    }
+  }
 
   render() {
     return (
       <div>
-        <VideoContainer playing={this.state.isPlaying} />
+        <VideoContainer
+          onProgress={this.onProgress}
+          onDuration={this.onDuration}
+          playing={this.state.isPlaying}
+          loop={}
+        />
         <PlaybackControls
           playPauseCallback={this.handlePlayPauseClick}
           forwardCallback={this.handleForwardClick}
@@ -51,14 +72,14 @@ class RadioPlayer extends React.Component {
         />
       </div>
     )
-  }
 
+  }
 }
 /*
  https://www.youtube.com/watch?v=Ug_9iMuuCjs
  https://www.youtube.com/watch?v=Nuko3Vcq4eI
  https://www.youtube.com/watch?v=TD2UsE3Lfdc
- */
+*/
 
 //this cna be later for playback speed
 class VideoContainer extends React.Component {
@@ -72,7 +93,13 @@ class VideoContainer extends React.Component {
     var urlWithTimestamp = ''; // set the url with the timestamp
     //TODO call the firebase and get the data
     return (
-      <ReactPlayer playing={this.props.playing} url={url}/>
+      <ReactPlayer
+        playing={this.props.playing}
+        url={url}
+        onProgress={this.props.onProgress}
+        onDuration={this.props.onDuration}
+        progressFrequency={1000}
+      />
     );
   }
 }
