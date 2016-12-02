@@ -85,7 +85,7 @@ class App extends Component {
               </Col>
             </Col>
           </Row>
-          <Queue />
+          {this.props.children}
         </main>
         <footer>
         </footer>
