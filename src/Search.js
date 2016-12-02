@@ -27,7 +27,10 @@ class Search extends Component {
       inputValue : '',
       results: [],
       durations: [],
-      finished: false
+      dialogText: '',
+      finished: false,
+      open: false,
+      song: {}
     }
   }
 
@@ -112,18 +115,32 @@ class Search extends Component {
     }
   }
 
-  handleCallback = result => {
-  console.log(result);
+  handleOpen = result => {
+    this.setState({song: result});
+    let text = "Do you want to put " + result.title + " into the queue?";
+    this.setState({dialogText: text});
+    this.setState({open: true});
+  };
+
+  handleClose = () => {
+    this.setState({open: false});
+  };
+
+  handleSubmit = result => {
+    //Add song to firebase. Should be attached to add to queue button
+    console.log(this.state.song);
+    this.setState({open: false});
   }
+
 
   render() {
     let content = [];
     if(this.state.finished) {
       let callback = this.props.callback;
       content = _.map(this.state.results, (elem, index) => {
-        let temp = {url: ytURL + elem.id.videoId, duration: this.state.durations[index], thumbnail: elem.snippet.thumbnails.default.url};
+        let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], thumbnail: elem.snippet.thumbnails.default.url};
         return <ListItem
-          onTouchTap={() => this.handleCallback(temp)}
+          onTouchTap={() => this.handleOpen(temp)}
           style={{overflow: 'hidden'}}
           innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
           key={elem.id.videoId}
@@ -134,6 +151,19 @@ class Search extends Component {
         />
       });
     }
+
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onTouchTap={this.handleClose}
+      />,
+      <FlatButton
+        label="Add to Queue"
+        primary={true}
+        onTouchTap={this.handleSubmit}
+      />,
+    ];
 
 
     return (
@@ -163,6 +193,16 @@ class Search extends Component {
             </List>
           </MuiThemeProvider>
         </Col>
+        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+          <Dialog
+            title="Confirm adding to Queue"
+            actions={actions}
+            modal={false}
+            open={this.state.open}
+            onRequestClose={this.handleClose}>
+            {this.state.dialogText}
+          </Dialog>
+        </MuiThemeProvider>
       </Row>
 
     );
