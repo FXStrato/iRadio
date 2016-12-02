@@ -14,14 +14,16 @@ class RadioPlayer extends React.Component {
       {
         isPlaying: false,
         localQueue: []
-
       };
+
   }
 
 
-  handlePlayPauseClick(event) {
+  handlePlayPauseClick = event => {
     console.log("I've been clicked! -- Play Pause");
     //TODO toggle the classNames so that 'fa fa-pause' is the new classname
+    var togglePlaying = !this.state.isPlaying;
+    this.setState({isPlaying: togglePlaying});
   }
 
   handleForwardClick(event) {
@@ -34,20 +36,19 @@ class RadioPlayer extends React.Component {
 
   handleRepeatClick(event) {
     console.log("I've been clicked! -- Repeat");
-
   }
 
-
-  togglePlay() {
-    var togglePlaying = !this.state.isPlaying;
-    this.setState({isPlaying: togglePlaying});
-  }
 
   render() {
     return (
       <div>
-        <VideoContainer />
-        <PlaybackControls />
+        <VideoContainer playing={this.state.isPlaying} />
+        <PlaybackControls
+          playPauseCallback={this.handlePlayPauseClick}
+          forwardCallback={this.handleForwardClick}
+          backwardCallback={this.handleBackwardClick}
+          repeatCallback={this.handleRepeatClick}
+        />
       </div>
     )
   }
@@ -71,7 +72,7 @@ class VideoContainer extends React.Component {
     var urlWithTimestamp = ''; // set the url with the timestamp
     //TODO call the firebase and get the data
     return (
-      <ReactPlayer url={url}/>
+      <ReactPlayer playing={this.props.playing} url={url}/>
     );
   }
 }
@@ -83,7 +84,6 @@ class PlaybackControls extends React.Component {
   }
 
   /*
-
    play
    pause
    step-backward
@@ -92,27 +92,7 @@ class PlaybackControls extends React.Component {
    volume-up
    volume-down
    volume-off
-
    */
-
-  handlePlayPauseClick(event) {
-    console.log("I've been clicked! -- Play Pause");
-    //TODO toggle the classNames so that 'fa fa-pause' is the new classname
-  }
-
-  handleForwardClick(event) {
-    console.log("I've been clicked! -- Forward");
-  }
-
-  handleBackwardClick(event) {
-    console.log("I've been clicked! -- Backward");
-  }
-
-  handleRepeatClick(event) {
-    console.log("I've been clicked! -- Repeat");
-
-  }
-
   render() {
 
     const iconStyle = {
@@ -124,22 +104,22 @@ class PlaybackControls extends React.Component {
         backward: {
           name: "backward",
           className: "fa fa-step-backward",
-          callback: this.handleBackwardClick
+          callback: this.props.backwardCallback
         },
         play : {
           name: "play",
           className: "fa fa-play",
-          callback: this.handlePlayPauseClick
+          callback: this.props.playPauseCallback
         },
         forward : {
           name: "forward",
           className: "fa fa-step-forward",
-          callback: this.handleForwardClick
+          callback: this.props.forwardCallback
         },
         repeat : {
           name: "repeat",
           className: "fa fa-repeat",
-          callback: this.handleRepeatClick
+          callback: this.props.repeatCallback
         }
       };
 
