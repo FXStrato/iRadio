@@ -18,6 +18,26 @@ class RadioPlayer extends React.Component {
       };
   }
 
+
+  handlePlayPauseClick(event) {
+    console.log("I've been clicked! -- Play Pause");
+    //TODO toggle the classNames so that 'fa fa-pause' is the new classname
+  }
+
+  handleForwardClick(event) {
+    console.log("I've been clicked! -- Forward");
+  }
+
+  handleBackwardClick(event) {
+    console.log("I've been clicked! -- Backward");
+  }
+
+  handleRepeatClick(event) {
+    console.log("I've been clicked! -- Repeat");
+
+  }
+
+
   togglePlay() {
     var togglePlaying = !this.state.isPlaying;
     this.setState({isPlaying: togglePlaying});
