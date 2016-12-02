@@ -1,6 +1,7 @@
 /*eslint no-unused-vars: "off"*/ //don't show warnings for unused
 import React, {Component} from 'react';
 import Time from 'react-time';
+import firebase from 'firebase';
 import JSONP from 'jsonp';
 import YoutubeFinder from 'youtube-finder';
 import {Link, hashHistory} from 'react-router';
@@ -130,6 +131,7 @@ class Search extends Component {
     //Add song to firebase. Should be attached to add to queue button
     console.log(this.state.song);
     this.setState({open: false});
+    this.setState({inputValue: ''});
   }
 
 
