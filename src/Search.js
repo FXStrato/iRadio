@@ -119,7 +119,7 @@ class Search extends Component {
   handleOpen = result => {
     this.setState({song: result});
     let text = <div>
-      <p className="flow-text">Would you like to add this song to the queue?</p>
+      <p className="flow-text">Song Queue Confirmation</p>
       <MuiThemeProvider className="center-align" muiTheme={getMuiTheme(darkBaseTheme)}>
         <List>
           <ListItem
@@ -129,8 +129,8 @@ class Search extends Component {
             key={'dialog-'+result.url}
             leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px'}} src={result.thumbnail} alt={result.url}/>}
             primaryText={<div style={{paddingTop: '20px'}}>{result.title}</div>}
-            secondaryText={result.duration}
-            secondaryTextLines={1}
+            secondaryText={result.channel + ' | ' + result.duration}
+            secondaryTextLines={2}
           />
         </List>
       </MuiThemeProvider>
@@ -156,7 +156,7 @@ class Search extends Component {
     if(this.state.finished) {
       let callback = this.props.callback;
       content = _.map(this.state.results, (elem, index) => {
-        let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], thumbnail: elem.snippet.thumbnails.default.url};
+        let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], channel:elem.snippet.channelTitle, thumbnail: elem.snippet.thumbnails.default.url};
         return <ListItem
           onTouchTap={() => this.handleOpen(temp)}
           style={{overflow: 'hidden'}}
@@ -213,12 +213,11 @@ class Search extends Component {
         </Col>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
           <Dialog
-            title="Confirm Queue Song"
+            title={this.state.dialogText}
             actions={actions}
             modal={false}
             open={this.state.open}
             onRequestClose={this.handleClose}>
-            {this.state.dialogText}
           </Dialog>
         </MuiThemeProvider>
       </Row>
