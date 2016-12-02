@@ -118,7 +118,23 @@ class Search extends Component {
 
   handleOpen = result => {
     this.setState({song: result});
-    let text = "Do you want to put " + result.title + " into the queue?";
+    let text = <div>
+      <p className="flow-text">Would you like to add this song to the queue?</p>
+      <MuiThemeProvider className="center-align" muiTheme={getMuiTheme(darkBaseTheme)}>
+        <List>
+          <ListItem
+            className="truncate"
+            disabled={true}
+            innerDivStyle={{padding: '0'}}
+            key={'dialog-'+result.url}
+            leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px'}} src={result.thumbnail} alt={result.url}/>}
+            primaryText={<div style={{paddingTop: '20px'}}>{result.title}</div>}
+            secondaryText={result.duration}
+            secondaryTextLines={1}
+          />
+        </List>
+      </MuiThemeProvider>
+    </div>
     this.setState({dialogText: text});
     this.setState({open: true});
   };
@@ -197,7 +213,7 @@ class Search extends Component {
         </Col>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
           <Dialog
-            title="Confirm adding to Queue"
+            title="Confirm Queue Song"
             actions={actions}
             modal={false}
             open={this.state.open}
