@@ -124,6 +124,7 @@ class VideoContainer extends React.Component {
     var url = this.props.nowPlaying;
     var urlWithTimestamp = ''; // set the url with the timestamp
     var kek = '';
+
     //TODO call the firebase and get the data
     return (
       <ReactPlayer
