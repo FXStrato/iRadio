@@ -6,6 +6,21 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 //fix an onTapEvent issue with react
 injectTapEventPlugin();
 
+
+var sampleTracks =
+  {
+    "id" : {
+      "url": "https://www.youtube.com/watch?v=Ug_9iMuuCjs"
+    },
+    "kek" : {
+      "url": "https://www.youtube.com/watch?v=Nuko3Vcq4eI"
+    },
+    "lol" : {
+      "url": "https://www.youtube.com/watch?v=TD2UsE3Lfdc"
+    }
+  }
+
+
 class RadioPlayer extends React.Component {
 
   constructor(props) {
@@ -13,24 +28,38 @@ class RadioPlayer extends React.Component {
     this.state =
       {
         isPlaying: false,
-        localQueue: [],
+        nowPlaying: "https://www.youtube.com/watch?v=Zasx9hjo4WY",
+        tracks: [
+          "https://www.youtube.com/watch?v=Ug_9iMuuCjs",
+          "https://www.youtube.com/watch?v=Nuko3Vcq4eI",
+          "https://www.youtube.com/watch?v=TD2UsE3Lfdc"
+        ],
         played: 0
       };
   }
 
-  handlePlayPauseClick = event => {
+  handlePlayPauseClick = () => {
     console.log("I've been clicked! -- Play Pause");
     //TODO toggle the classNames so that 'fa fa-pause' is the new classname
     var togglePlaying = !this.state.isPlaying;
     this.setState({isPlaying: togglePlaying});
   }
 
-  handleForwardClick = event => {
+  handleForwardClick = () => {
     console.log("I've been clicked! -- Forward");
+    var newNowPlaying = this.state.tracks[0];
+    var shiftedTracks = this.state.tracks;
+    shiftedTracks.shift();
+    var newState = {
+      nowPlaying: newNowPlaying,
+      tracks: shiftedTracks
+    };
+    this.setState(newState);
   }
 
-  handleBackwardClick = event => {
+  handleBackwardClick = () => {
     console.log("I've been clicked! -- Backward");
+    //TODO let's implement this last
   }
 
   handleRepeatClick = () => {
@@ -62,7 +91,8 @@ class RadioPlayer extends React.Component {
           onProgress={this.onProgress}
           onDuration={this.onDuration}
           playing={this.state.isPlaying}
-          loop={}
+          nowPlaying={this.state.nowPlaying}
+          loop={true}
         />
         <PlaybackControls
           playPauseCallback={this.handlePlayPauseClick}
@@ -79,6 +109,8 @@ class RadioPlayer extends React.Component {
  https://www.youtube.com/watch?v=Ug_9iMuuCjs
  https://www.youtube.com/watch?v=Nuko3Vcq4eI
  https://www.youtube.com/watch?v=TD2UsE3Lfdc
+
+
 */
 
 //this cna be later for playback speed
@@ -89,8 +121,9 @@ class VideoContainer extends React.Component {
   }
 
   render() {
-    var url = 'https://www.youtube.com/watch?v=Ug_9iMuuCjs';
+    var url = this.props.nowPlaying;
     var urlWithTimestamp = ''; // set the url with the timestamp
+    var kek = '';
     //TODO call the firebase and get the data
     return (
       <ReactPlayer
@@ -99,6 +132,7 @@ class VideoContainer extends React.Component {
         onProgress={this.props.onProgress}
         onDuration={this.props.onDuration}
         progressFrequency={1000}
+        loop={this.props.loop}
       />
     );
   }
