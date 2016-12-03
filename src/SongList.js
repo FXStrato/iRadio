@@ -1,9 +1,7 @@
 import React from 'react';
-import App from './App';
 import _ from 'lodash';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import {Card, CardTitle} from 'react-materialize';
 import {List, ListItem} from 'material-ui';
 
 

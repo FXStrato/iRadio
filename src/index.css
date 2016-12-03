@@ -23,3 +23,15 @@ h2 {
   font-size: 2.5rem;
   color: #fff;
 }
+.help-block{
+  color:red;
+  font-size:12px;
+  margin:0px;
+  padding-bottom: 10px;
+}
+.input{
+  color:white;
+}
+a{
+  color:#2bbbad;
+}

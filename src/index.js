@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import firebase from 'firebase';
 import {Router, Route, hashHistory} from 'react-router';
 import {SignUpForm} from './SignUp';
 import {SignInForm} from './SignIn';
@@ -19,18 +18,6 @@ var config = {
   databaseURL: "https://iradio-f1ac9.firebaseio.com",
   storageBucket: "iradio-f1ac9.appspot.com",
   messagingSenderId: "213823088604"
-};
-firebase.initializeApp(config);
-
-//load other CSS files
-import '../node_modules/materialize-css/dist/css/materialize.min.css';
-
-var config = {
-  apiKey: "AIzaSyBVGyJq21xT2zRpbNMqBAtvq9haT7gMI08",
-  authDomain: "iradio-614db.firebaseapp.com",
-  databaseURL: "https://iradio-614db.firebaseio.com",
-  storageBucket: "iradio-614db.appspot.com",
-  messagingSenderId: "552716146199"
 };
 firebase.initializeApp(config);
 

@@ -33,31 +33,11 @@ class App extends Component {
 
         </header>
         <main className="container">
-<<<<<<< HEAD
-          <Row>
-            <Col s={12} m={12} l={6}>
-              <Col s={12}>
-                <h1 className="center-align">Search</h1>
-                <Search
-                  apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-                  callback={this.searchCallback} />
-              </Col>
-              <Col s={12}>
-                <MuiThemeProvider muiTheme={getMuiTheme()}>
-                  <List style={{height: '600px', overflowY:'auto'}}>
-                    {content}
-                  </List>
-                </MuiThemeProvider>
-              </Col>
-            </Col>
-          </Row>
-          {this.props.children}
-=======
           <h1 className="center-align">Search</h1>
           <Search
             apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
             callback={this.searchCallback} />
->>>>>>> b1c96e26f035808037214561ffa1fa55195e51d5
+          {this.props.children}
         </main>
         <footer>
         </footer>

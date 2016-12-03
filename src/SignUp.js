@@ -45,7 +45,7 @@ class SignUpForm extends React.Component {
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(function(firebaseUser) {
         //include information (for app-level content)
-        firebaseUser.sendEmailVerification();
+        //firebaseUser.sendEmailVerification();
         //var link = 'https://www.gravatar.com/avatar/' + md5(email);
         var profilePromise = firebaseUser.updateProfile({
           displayName: handle,
@@ -102,6 +102,15 @@ class SignUpForm extends React.Component {
           errors.isValid = false;
         }
       }
+
+      //handle password type
+      if(validations.password){
+        var valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
+        if(!valid){
+          errors.password = true;
+          errors.isValid = false;
+        }
+      }
     }
 
     //display details
@@ -120,7 +129,7 @@ class SignUpForm extends React.Component {
   render() {
     //field validation
     var emailErrors = this.validate(this.state.email, {required:true, email:true});
-    var passwordErrors = this.validate(this.state.password, {required:true, minLength:6});
+    var passwordErrors = this.validate(this.state.password, {required:true, minLength:6, password:true});
     var matchErrors = this.validate(this.state.match, {required:true, passwordInput:this.state.password})//check match error 
     var handleErrors = this.validate(this.state.user, {required:true, minLength:3});
 
@@ -153,13 +162,6 @@ class SignUpForm extends React.Component {
   }
 }
 
-//to enforce proptype declaration
-/*SignUpForm.propTypes = {
-  signUpCallback: React.PropTypes.func.isRequired,
-  signInCallback: React.PropTypes.func.isRequired
-};*/
-
-
 //A component that displays an input form with validation styling
 //props are: field, type, label, changeCallback, errors
 class ValidatedInput extends React.Component {
@@ -168,7 +170,7 @@ class ValidatedInput extends React.Component {
     return (
       <div className={"form-group "+this.props.errors.style}>
         <label htmlFor={this.props.field} className="control-label">{this.props.label}</label>
-        <input id={this.props.field} type={this.props.type} name={this.props.field} className="form-control" onChange={this.props.changeCallback} />
+        <input id={this.props.field} type={this.props.type} name={this.props.field} className="input" onChange={this.props.changeCallback} />
         <ValidationErrors errors={this.props.errors} />
       </div>
     );
@@ -191,6 +193,9 @@ class ValidationErrors extends React.Component {
         }
         {this.props.errors.passwordInput &&
           <p className="help-block">Must match with the previous password</p>
+        }
+        {this.props.errors.password &&
+          <p className="help-block">Must contain a digit and a alpha with size 6-15</p>
         }
       </div>
     );

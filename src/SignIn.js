@@ -51,13 +51,21 @@ class SignInForm extends React.Component{
         errors.isValid = false;
       }
 
-      //handle email type ??
+      //handle email type 
       if(validations.email){
         //pattern comparison from w3c
-        //https://www.w3.org/TR/html-markup/input.email.html#input.email.attrs.value.single
+        //https://www.w3.org/TR/html-markup/input.email.html#input.email.attrs.value.single    
         var valid = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value)
         if(!valid){
           errors.email = true;
+          errors.isValid = false;
+        }
+      }
+      //handle password type
+      if(validations.password){
+        var valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
+        if(!valid){
+          errors.password = true;
           errors.isValid = false;
         }
       }
@@ -79,7 +87,7 @@ class SignInForm extends React.Component{
   render() {
     //field validation
     var emailErrors = this.validate(this.state.email, {required:true, email:true});
-    var passwordErrors = this.validate(this.state.password, {required:true, minLength:6});
+    var passwordErrors = this.validate(this.state.password, {required:true, minLength:6, password:true});
 
     //button validation
     var signInEnabled = (emailErrors.isValid && passwordErrors.isValid);
@@ -110,7 +118,7 @@ class ValidatedInput extends React.Component {
     return (
       <div className={"form-group "+this.props.errors.style}>
         <label htmlFor={this.props.field} className="control-label">{this.props.label}</label>
-        <input id={this.props.field} type={this.props.type} name={this.props.field} className="form-control" onChange={this.props.changeCallback} />
+        <input id={this.props.field} type={this.props.type} name={this.props.field} className="input" onChange={this.props.changeCallback} />
         <ValidationErrors errors={this.props.errors} />
       </div>
     );
@@ -130,6 +138,9 @@ class ValidationErrors extends React.Component {
         }
         {this.props.errors.minLength &&
           <p className="help-block">Must be at least {this.props.errors.minLength} characters.</p>        
+        }
+        {this.props.errors.password &&
+          <p className="help-block">Must contain a digit and a alpha with size 6-15</p>
         }
       </div>
     );
