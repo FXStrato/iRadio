@@ -13,11 +13,11 @@ import firebase from 'firebase';
 // Needed for onTouchTap
 injectTapEventPlugin();
 var config = {
-  apiKey: "AIzaSyDXZgOUaCyE383c5EDHJ0ku6GseX5J6BM8",
-  authDomain: "iradio-f1ac9.firebaseapp.com",
-  databaseURL: "https://iradio-f1ac9.firebaseio.com",
-  storageBucket: "iradio-f1ac9.appspot.com",
-  messagingSenderId: "213823088604"
+  apiKey: "AIzaSyBVGyJq21xT2zRpbNMqBAtvq9haT7gMI08",
+  authDomain: "iradio-614db.firebaseapp.com",
+  databaseURL: "https://iradio-614db.firebaseio.com",
+  storageBucket: "iradio-614db.appspot.com",
+  messagingSenderId: "552716146199"
 };
 firebase.initializeApp(config);
 
