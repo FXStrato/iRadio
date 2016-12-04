@@ -7,7 +7,9 @@ import Search from './Search';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+import firebase from 'firebase';
 
+import LandingPage from './LandingPage';
 
 class App extends Component {
   constructor(props) {
@@ -30,6 +32,7 @@ class App extends Component {
 
         </header>
         <main className="container">
+          <LandingPage />
           <h1 className="center-align">Search</h1>
           <Search
             apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
