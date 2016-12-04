@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import firebase from 'firebase';
-import {Router, Route, hashHistory} from 'react-router';
+import {Router, Route, hashHistory, IndexRoute} from 'react-router';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import App from './App';
 import '../node_modules/materialize-css/dist/css/materialize.min.css';
@@ -23,12 +23,13 @@ var config = {
 firebase.initializeApp(config);
 
 ReactDOM.render(
-  // <Router history={hashHistory}>
-  //   <Route path="/" component={App}>
-  //     <IndexRoute component={LandingPage} />
-  //       <Route path="LandingPage" component={LandingPage}>
-  //       </Route>
-  // </Router>,
-  <App/>,
+  <Router history={hashHistory}>
+    <Route path="/" component={App}>
+      <IndexRoute component={LandingPage} />
+        <Route path="LandingPage" component={LandingPage}>
+        </Route>
+    </Route>
+  </Router>,
+
   document.getElementById('root')
 );
