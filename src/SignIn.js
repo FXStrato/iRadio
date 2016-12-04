@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from 'react-router';
+//import {Link} from 'react-router';
 import firebase from 'firebase';
 
 class SignInForm extends React.Component{
@@ -9,7 +9,7 @@ class SignInForm extends React.Component{
     this.state = {
       'email': undefined,
       'password': undefined,
-    }; 
+    };
     //function binding
     this.handleChange = this.handleChange.bind(this);
   }
@@ -21,7 +21,7 @@ class SignInForm extends React.Component{
       var changes = {}; //object to hold changes
       changes[field] = value; //change this field
       this.setState(changes); //update state
-  }    
+  }
 
   //handle signIn button
   signIn(event) {
@@ -37,7 +37,7 @@ class SignInForm extends React.Component{
 
   validate(value, validations) {
     var errors = {isValid: true, style:''};
-    
+
     if(value !== undefined){ //check validations
       //handle required
       if(validations.required && value === ''){
@@ -51,10 +51,10 @@ class SignInForm extends React.Component{
         errors.isValid = false;
       }
 
-      //handle email type 
+      //handle email type
       if(validations.email){
         //pattern comparison from w3c
-        //https://www.w3.org/TR/html-markup/input.email.html#input.email.attrs.value.single    
+        //https://www.w3.org/TR/html-markup/input.email.html#input.email.attrs.value.single
         var valid = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value)
         if(!valid){
           errors.email = true;
@@ -105,7 +105,7 @@ class SignInForm extends React.Component{
 
           <div className="form-group sign-up-buttons">
             <button className="btn btn-primary" disabled={!signInEnabled} onClick={(e) => this.signIn(e)}>Sign-in</button>
-            <p> Don't have an account yet?<Link to="/join" activeClassName="activeLink">SIGN UP</Link></p>
+            {/*<p> Don&#39;t have an account yet?<Link to="/join" activeClassName="activeLink">SIGN UP</Link></p>*/}
           </div>
         </form>
       </div>
@@ -122,7 +122,7 @@ class ValidatedInput extends React.Component {
         <ValidationErrors errors={this.props.errors} />
       </div>
     );
-  }  
+  }
 }
 
 //a component to represent and display validation errors
@@ -137,7 +137,7 @@ class ValidationErrors extends React.Component {
           <p className="help-block">Not an email address!</p>
         }
         {this.props.errors.minLength &&
-          <p className="help-block">Must be at least {this.props.errors.minLength} characters.</p>        
+          <p className="help-block">Must be at least {this.props.errors.minLength} characters.</p>
         }
         {this.props.errors.password &&
           <p className="help-block">Must contain a digit and a alpha with size 6-15</p>
@@ -149,13 +149,3 @@ class ValidationErrors extends React.Component {
 
 export {SignInForm}
 export default SignInForm;
-
-
-
-
-
-
-
-
-
-

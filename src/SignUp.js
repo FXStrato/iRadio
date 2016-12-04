@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from 'react-router';
+//import {Link} from 'react-router';
 import firebase from 'firebase';
 //import md5 from 'js-md5';
 
@@ -17,7 +17,7 @@ class SignUpForm extends React.Component {
       'password': undefined,
       'match':undefined,//find a match password
       'user':undefined,
-    }; 
+    };
 
     //function binding
     this.handleChange = this.handleChange.bind(this);
@@ -41,7 +41,7 @@ class SignUpForm extends React.Component {
 
   signUpCallback(email, handle, password, match) {
     /* Create a new user and save their information */
-   
+
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(function(firebaseUser) {
         //include information (for app-level content)
@@ -53,7 +53,7 @@ class SignUpForm extends React.Component {
         }); //return promise for chaining
 
         //create new entry in the Cloud DB (for others to reference)
-				var userRef = firebase.database().ref('users/'+firebaseUser.uid); 
+				var userRef = firebase.database().ref('users/'+firebaseUser.uid);
         var userData = {
           handle:handle,
           avatar:'https://www.gravatar.com/avatar/'
@@ -63,17 +63,17 @@ class SignUpForm extends React.Component {
       })
 
   }
-  
+
 
   /**
    * A helper function to validate a value based on a hash of validations
-   * second parameter has format e.g., 
+   * second parameter has format e.g.,
    * {required: true, minLength: 5, email: true}
    * (for required field, with min length of 5, and valid email)
    */
   validate(value, validations) {
     var errors = {isValid: true, style:''};
-    
+
     if(value !== undefined){ //check validations
       //handle required
       if(validations.required && value === ''){
@@ -90,7 +90,7 @@ class SignUpForm extends React.Component {
         errors.passwordInput = true;
         errors.isValid = false;
       }
-      
+
 
       //handle email type ??
       if(validations.email){
@@ -130,7 +130,7 @@ class SignUpForm extends React.Component {
     //field validation
     var emailErrors = this.validate(this.state.email, {required:true, email:true});
     var passwordErrors = this.validate(this.state.password, {required:true, minLength:6, password:true});
-    var matchErrors = this.validate(this.state.match, {required:true, passwordInput:this.state.password})//check match error 
+    var matchErrors = this.validate(this.state.match, {required:true, passwordInput:this.state.password})//check match error
     var handleErrors = this.validate(this.state.user, {required:true, minLength:3});
 
     //button validation
@@ -154,7 +154,7 @@ class SignUpForm extends React.Component {
 
           <div className="form-group sign-up-buttons">
             <button className="btn btn-primary" disabled={!signUpEnabled} onClick={(e) => this.signUp(e)}>Sign-up</button>
-            <p> Already have an account?<Link to="/login" activeClassName="activeLink">SIGN IN</Link></p>
+            {/*<p> Already have an account?<Link to="/login" activeClassName="activeLink">SIGN IN</Link></p>*/}
           </div>
         </form>
       </div>
@@ -174,7 +174,7 @@ class ValidatedInput extends React.Component {
         <ValidationErrors errors={this.props.errors} />
       </div>
     );
-  }  
+  }
 }
 
 //a component to represent and display validation errors
@@ -189,7 +189,7 @@ class ValidationErrors extends React.Component {
           <p className="help-block">Not an email address!</p>
         }
         {this.props.errors.minLength &&
-          <p className="help-block">Must be at least {this.props.errors.minLength} characters.</p>        
+          <p className="help-block">Must be at least {this.props.errors.minLength} characters.</p>
         }
         {this.props.errors.passwordInput &&
           <p className="help-block">Must match with the previous password</p>
