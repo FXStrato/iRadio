@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
 import firebase from 'firebase';
+import '../public/css/styles.css';
+
 
   // Initialize Firebase
   var config = {
