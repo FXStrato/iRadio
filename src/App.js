@@ -8,7 +8,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import firebase from 'firebase';
-
+import {Link, hashHistory} from 'react-router';
 import LandingPage from './LandingPage';
 
 class App extends Component {
@@ -32,11 +32,11 @@ class App extends Component {
 
         </header>
         <main className="container">
-          <LandingPage />
+          <Link to="/landing-page"><LandingPage /></Link>
           <h1 className="center-align">Search</h1>
-          <Search
+          <Link to="/search"><Search
             apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-            callback={this.searchCallback} />
+            callback={this.searchCallback} /></Link>
         </main>
         <footer>
 
