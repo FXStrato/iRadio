@@ -33,7 +33,7 @@ class Room extends Component {
           <br/>
           <Col s={12}>
             <h1>Now Playing {this.state.nowPlaying.title}</h1>
-            <img src={this.state.nowPlaying.thumbnail} alt={this.state.nowPlaying.title}/>
+            <RadioPlayer  />
           </Col>
         </Row>
         <Row>
