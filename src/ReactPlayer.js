@@ -25,8 +25,7 @@ class RadioPlayer extends React.Component {
 
     firebase.auth().signInWithEmailAndPassword("evan@test.com", "123123")
       .catch((err) => console.log(err));
-    //var channelId = this.props.channelId;
-    let channelId = "evanTest";
+    var channelId = this.props.params.roomID;
     let refPath = "channels/" + channelId;
 
     let channelRef = firebase.database().ref(refPath);
@@ -49,13 +48,13 @@ class RadioPlayer extends React.Component {
     //TODO toggle the classNames so that 'fa fa-pause' is the new classname
     var thisState = this.state.nowPlaying;
     thisState.isPlaying = !this.state.nowPlaying.isPlaying;
-    var nowPlayingRef = firebase.database().ref("channels/evanTest/nowPlaying");
+    var nowPlayingRef = firebase.database().ref("channels/" + this.props.params.roomID + "/nowPlaying");
     nowPlayingRef.set(thisState);
   };
 
   //handles the fast forwrd clicking and updates the firebase instance
   handleForwardClick = () => {
-    var refPath = "channels/evanTest";
+    var refPath = "channels/" + this.props.params.roomID;
     var queueRef = firebase.database().ref(refPath + "/queue");
     var newTrack = {};
     queueRef.orderByKey().limitToFirst(1)
@@ -120,7 +119,7 @@ class RadioPlayer extends React.Component {
       }
     };
 
-    var queueRef = firebase.database().ref("channels/evanTest");
+    var queueRef = firebase.database().ref("channels/" + this.props.params.roomID);
     queueRef.set(reset);
 
   };
@@ -142,7 +141,7 @@ class RadioPlayer extends React.Component {
           var newNowPlayingState = this.state.nowPlaying;
           newNowPlayingState.progress = state["played"];
           this.setState(newNowPlayingState);
-          firebase.database().ref("channels/evanTest/nowPlaying").set(newNowPlayingState);
+          firebase.database().ref("channels/"+ this.props.params.roomID +"/nowPlaying").set(newNowPlayingState);
         }
       }
     }
