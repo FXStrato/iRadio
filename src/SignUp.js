@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "off"*/ //don't show warnings for unused
 import React from 'react';
 import {TextField, RaisedButton} from 'material-ui';
 //import {Link} from 'react-router';
@@ -103,12 +104,12 @@ class SignUpForm extends React.Component {
         errors.isValid = false;
       }
 
-
+      let valid;
       //handle email type ??
       if(validations.email){
         //pattern comparison from w3c
         //https://www.w3.org/TR/html-markup/input.email.html#input.email.attrs.value.single
-        var valid = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value)
+        valid = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value)
         if(!valid){
           errors.email = true;
           errors.isValid = false;
@@ -117,7 +118,7 @@ class SignUpForm extends React.Component {
 
       //handle password type
       if(validations.password){
-        var valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
+        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
         if(!valid){
           errors.password = true;
           errors.isValid = false;
