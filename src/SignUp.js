@@ -182,7 +182,7 @@ class SignUpForm extends React.Component {
     }
 
     return (
-      <div className="container">
+      <div>
         <Row>
           <Col s={12} m={6} l={6}>
             <h1>Sign Up Here!</h1>

@@ -19,6 +19,7 @@ class LandingPage extends React.Component {
     open: false,
     createDialog: false,
     roomName: '',
+    errorText: '',
     userEmail: 'init',
     userID: 'init',
     roomMade: null
@@ -60,10 +61,14 @@ componentWillUnmount() {
   handleChange = event => {
     var value = event.target.value;
     this.setState({roomName:value});
+    if(this.state.errorText !== '') {
+      this.setState({errorText: ''});
+    }
   }
 
   handleClose = () => {
     this.setState({open: false});
+    this.setState({errorText: ''})
   };
 
   handleOpen = isCreate => {
@@ -82,7 +87,6 @@ componentWillUnmount() {
   }
 
   handleAction = () => {
-    this.handleClose();
     //if creating, init room. Dummy data is inserted for now. Else, join the given room
     if(this.state.createDialog) {
       let roomRef = firebase.database().ref('channels/jeff');
@@ -100,10 +104,18 @@ componentWillUnmount() {
       })
       roomRef.off();
       this.auth();
+      this.handleClose();
       hashHistory.push('room/jeff');
     } else {
       //Need to run a check if room exists here.
-      hashHistory.push('room/' + this.state.roomName);
+      let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
+        if(snapshot.val()) {
+          //True, means the room exists
+          hashHistory.push('room/' + this.state.roomName);
+        } else {
+          this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
+        }
+      });
     }
 
   }
@@ -155,7 +167,7 @@ componentWillUnmount() {
     }
 
     return (
-      <div>
+      <div className="container">
         {content}
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
            <Dialog
@@ -169,7 +181,7 @@ componentWillUnmount() {
                 floatingLabelText="Room ID"
                 id='joinroom-input'
                 onChange={this.handleChange}
-                required
+                errorText={this.state.errorText}
               />
               </MuiThemeProvider>}
            </Dialog>

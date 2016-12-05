@@ -11,11 +11,12 @@ import Search from './Search';
 
 
 
-//Room that will host all the functionality of our app
+//Room that will host all the functionality of our app. Need tabs for queue, history, and now playing
 class Room extends Component {
   state = {
     roomID: '',
-    nowPlaying: {}
+    nowPlaying: {},
+    value: 'np'
   }
 
   componentDidMount = () => {
@@ -26,26 +27,62 @@ class Room extends Component {
     });
   }
 
+  handleChange = value => {
+    this.setState({value: value});
+  }
+
+  searchCallback = result => {
+    if(result) {
+      this.setState({value: 'q'});
+    }
+  }
+
   render() {
     return (
-      <div>
-        <Row>
-          <br/>
-          <Col s={12}>
-            <h1>Now Playing {this.state.nowPlaying.title}</h1>
-            <img src={this.state.nowPlaying.thumbnail} alt={this.state.nowPlaying.title}/>
-          </Col>
-        </Row>
-        <Row>
-          <Col s={12}>
-            <h1 className="center-align">Search</h1>
-            <Search
-              apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-              callback={this.searchCallback}
-              room={this.state.roomID} />
-          </Col>
-        </Row>
-      </div>
+        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+          <Tabs value={this.state.value} onChange={this.handleChange}>
+            <Tab label="Now Playing" value="np" style={{backgroundColor: '#424242', color: '#fff'}}>
+              <div className="container">
+                <Row>
+                  <br/>
+                  <Col s={12}>
+                    <h1>Now Playing {this.state.nowPlaying.title}</h1>
+                    <img src={this.state.nowPlaying.thumbnail} alt={this.state.nowPlaying.title}/>
+                  </Col>
+                </Row>
+              </div>
+            </Tab>
+            <Tab label="Queue" value="q" style={{backgroundColor: '#424242', color: '#fff'}}>
+              <div className="container">
+                <h1>Queue</h1>
+                <p>
+                  This is where queue happens
+                </p>
+              </div>
+            </Tab>
+            <Tab label="Search" value="s" style={{backgroundColor: '#424242', color: '#fff'}}>
+              <div className="container">
+                <Row>
+                  <Col s={12}>
+                    <h1 className="center-align">Search</h1>
+                    <Search
+                      apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
+                      callback={this.searchCallback}
+                      room={this.state.roomID} />
+                  </Col>
+                </Row>
+              </div>
+            </Tab>
+            <Tab label="History" value="h" style={{backgroundColor: '#424242', color: '#fff'}}>
+              <div className="container">
+                <h1>History</h1>
+                <p>
+                  This is where history will go
+                </p>
+              </div>
+            </Tab>
+          </Tabs>
+        </MuiThemeProvider>
     );
   }
 }
