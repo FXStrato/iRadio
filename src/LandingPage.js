@@ -77,6 +77,7 @@ componentWillUnmount() {
   }
 
   handleJoinOwnRoom = () => {
+    //Get user handle, and join the room
     hashHistory.push('room/jeff');
   }
 
@@ -136,6 +137,26 @@ componentWillUnmount() {
             </MuiThemeProvider>
           </Col>
         </Row>
+      </div>
+    } else if(this.state.userID !== 'init') {
+      content =  <div>
+        <Row>
+          <Col s={12}>
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+              <RaisedButton label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap}/>
+            </MuiThemeProvider>
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+              <RaisedButton labelStyle={{color:'#fff'}} secondary={true} label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+            </MuiThemeProvider>
+          </Col>
+        </Row>
+            {this.state.signin ? <SignInForm/> : <SignUpForm/>}
+      </div>
+    }
+
+    return (
+      <div>
+        {content}
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
            <Dialog
            title={'Create Your Room'.toUpperCase()}
@@ -152,23 +173,6 @@ componentWillUnmount() {
               </MuiThemeProvider>}
            </Dialog>
          </MuiThemeProvider>
-      </div>
-    } else if(this.state.userID !== 'init') {
-      content = <Row>
-        <Col s={12}>
-          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-            <RaisedButton label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap}/>
-          </MuiThemeProvider>
-        </Col>
-        <Col s={12}>
-          {this.state.signin ? <SignInForm/> : <SignUpForm/>}
-        </Col>
-      </Row>
-    }
-
-    return (
-      <div>
-        {content}
       </div>
     );
   }
