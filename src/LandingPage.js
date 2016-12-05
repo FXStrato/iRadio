@@ -19,9 +19,9 @@ class LandingPage extends React.Component {
     open: false,
     createDialog: false,
     roomName: '',
-    userEmail: null,
-    userID: null,
-    roomMade: false
+    userEmail: 'init',
+    userID: 'init',
+    roomMade: null
   }
 
   componentDidMount() {
@@ -34,12 +34,15 @@ class LandingPage extends React.Component {
       firebase.database().ref('channels/jeff').once('value').then(snapshot => {
         if(snapshot.val().owner) {
           this.setState({roomMade: true})
+        } else {
+          this.setState({roomMade: false})
         }
       });
 
     }
     else{
       this.setState({userID: null}); //null out the saved state
+      this.setState({userEmail: null})
     }
   })
 }
@@ -122,10 +125,10 @@ componentWillUnmount() {
         <Row className="center-align">
           <br/>
           <Col s={12}>
-            {this.state.roomMade && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+            {this.state.roomMade === true && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
               <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Enter Created Room" onTouchTap={this.handleJoinOwnRoom}/>
             </MuiThemeProvider>}
-            {!this.state.roomMade && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+            {this.state.roomMade === false && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
               <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Create Room" onTouchTap={() => {this.handleOpen(true)}}/>
             </MuiThemeProvider>}
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
@@ -150,7 +153,7 @@ componentWillUnmount() {
            </Dialog>
          </MuiThemeProvider>
       </div>
-    } else {
+    } else if(this.state.userID !== 'init') {
       content = <Row>
         <Col s={12}>
           <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
