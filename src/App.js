@@ -8,10 +8,6 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import firebase from 'firebase';
 import {Link, hashHistory} from 'react-router';
-<<<<<<< HEAD
-=======
-
->>>>>>> 96186ba41e588011748c8346a7093bd22e9e7384
 import LandingPage from './LandingPage';
 
 class App extends Component {
@@ -90,13 +86,10 @@ class App extends Component {
         </header>
         <main className="container">
           {this.props.children}
-<<<<<<< HEAD
-=======
           {/* <h1 className="center-align">Search</h1>
           <Search
             apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
             callback={this.searchCallback} /> */}
->>>>>>> 96186ba41e588011748c8346a7093bd22e9e7384
         </main>
         <footer>
 
