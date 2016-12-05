@@ -7,9 +7,7 @@ import firebase from 'firebase';
 //fix an onTapEvent issue with react
 injectTapEventPlugin();
 
-
-
-//eventually we're going to want to change all of the setStates to save to Firebase refs
+//RadioPlayer componenet that has both the video container and the playback controls
 class RadioPlayer extends React.Component {
 
   constructor(props) {
@@ -21,7 +19,6 @@ class RadioPlayer extends React.Component {
         queue:{},
         volume: 0.75
       };
-
   }
 
   componentDidMount() {
@@ -31,8 +28,6 @@ class RadioPlayer extends React.Component {
     //var channelId = this.props.channelId;
     let channelId = "evanTest";
     let refPath = "channels/" + channelId;
-
-
 
     let channelRef = firebase.database().ref(refPath);
     channelRef.on("value", (snapshot) => {
@@ -49,8 +44,8 @@ class RadioPlayer extends React.Component {
     })
   }
 
+  //handles the playing and pausing of the video for the whole room. only admin should have control over thi
   handlePlayPauseClick = () => {
-    console.log("I've been clicked! -- Play Pause");
     //TODO toggle the classNames so that 'fa fa-pause' is the new classname
     var thisState = this.state.nowPlaying;
     thisState.isPlaying = !this.state.nowPlaying.isPlaying;
@@ -58,15 +53,11 @@ class RadioPlayer extends React.Component {
     nowPlayingRef.set(thisState);
   };
 
+  //handles the fast forwrd clicking and updates the firebase instance
   handleForwardClick = () => {
-
-    this.localUrl = null;
-
     var refPath = "channels/evanTest";
     var queueRef = firebase.database().ref(refPath + "/queue");
-
     var newTrack = {};
-
     queueRef.orderByKey().limitToFirst(1)
       .once("value", (snapshot) => {
         var newTrackContainer = snapshot.val();
@@ -78,7 +69,6 @@ class RadioPlayer extends React.Component {
 
     //removes the child
     firebase.database().ref(refPath + "/queue/" + newTrack.key).remove();
-
     var newQueue = {};
     queueRef.once("value", (snapshot) => {
       newQueue = snapshot.val();
@@ -97,8 +87,8 @@ class RadioPlayer extends React.Component {
     nowPlayingRef.child("nowPlaying").set(newNowPlaying);
   };
 
+  //for now, resets the queue
   handleBackwardClick = () => {
-    console.log("I've been clicked! -- Backward");
     //TODO let's implement this last
 
     var reset = {
@@ -128,7 +118,7 @@ class RadioPlayer extends React.Component {
           duration: 230
         }
       }
-    }
+    };
 
     var queueRef = firebase.database().ref("channels/evanTest");
     queueRef.set(reset);
@@ -141,27 +131,24 @@ class RadioPlayer extends React.Component {
   //   this.setState({isLooping:toggleLooping});
   // };
 
+  //updates the state and firebase with each 'onProgress' call made by the react-player to make sure any joining users are up to date with the player
   onProgress = state => {
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
-      console.log(state);
       if(state.hasOwnProperty("played")){
         if(this.state.nowPlaying.progress - state["played"] > 0.05) {
-          console.log("I'm behind!");
           this.forceUpdate();
-
         } else {
-          console.log("I'm the leader!");
           var newNowPlayingState = this.state.nowPlaying;
           newNowPlayingState.progress = state["played"];
           this.setState(newNowPlayingState);
           firebase.database().ref("channels/evanTest/nowPlaying").set(newNowPlayingState);
         }
-
       }
     }
   };
 
+  //converts a time elapsed value into a valid youtube timestamp
   convertToYoutubeTimestamp = timeElapsed => {
     var hours = "";
     if(timeElapsed > 3600) {
@@ -184,29 +171,22 @@ class RadioPlayer extends React.Component {
     }
   };
 
+  //when the video ends, handles the aciton to take it to the next video
   onVideoEnd = () => {
     this.handleForwardClick();
   };
 
+  //handles a user's changing volume
   handleVolumeChange = (e, value) => {
-    //this.setState({volume:value});
+    this.setState({volume:value});
   };
 
-  onDuration = state => {
-    // We only want to update time slider if we are not currently seeking
-    // if (!this.state.seeking) {
-    //   this.setState({duration:state});
-    // }
-  };
-
+  //renders the entire video player
   render() {
     var updated = JSON.parse(localStorage.getItem("updated"));
-
     var urlToInput = this.state.nowPlaying.baseUrl;
     var tempUrl = JSON.parse(localStorage.getItem("tempUrl"));
-
     if(!updated && this.state.nowPlaying.progress) {
-      console.log(tempUrl);
       if((tempUrl === null || tempUrl === undefined) ) {
         var timeOfCurrentVideo = this.state.nowPlaying.progress * this.state.nowPlaying.duration;
         tempUrl = this.state.nowPlaying.baseUrl + this.convertToYoutubeTimestamp(timeOfCurrentVideo);
@@ -214,21 +194,22 @@ class RadioPlayer extends React.Component {
       }
       urlToInput = tempUrl;
       localStorage.setItem("updated", JSON.stringify(true));
-    } else if(tempUrl) {
+    } else if(tempUrl && tempUrl.startsWith(this.state.nowPlaying.baseUrl)) {
       urlToInput = tempUrl;
+    } else {
+      localStorage.removeItem("tempUrl");
     }
-    console.log(urlToInput);
-
     return (
       <div>
         <VideoContainer
           onProgress={this.onProgress}
-          onDuration={this.onDuration}
           onVideoEnd={this.onVideoEnd}
           url={urlToInput}
           nowPlaying={this.state.nowPlaying}
           volume={this.state.volume}
         />
+        <h1>{this.state.nowPlaying.title}</h1>
+        <span>{this.state.nowPlaying.duration}</span>
         <PlaybackControls
           playPauseCallback={this.handlePlayPauseClick}
           forwardCallback={this.handleForwardClick}
@@ -237,11 +218,10 @@ class RadioPlayer extends React.Component {
         />
       </div>
     )
-
   }
 }
 
-//this cna be later for playback speed
+//Video container that has the playing youtube video for the room
 class VideoContainer extends React.Component {
 
   constructor(props) {
@@ -249,15 +229,6 @@ class VideoContainer extends React.Component {
     this.state = {
       timeElapsedQuery: ""
     }
-  }
-
-  componentDidMount() {
-    // let timeElapsed = this.props.nowPlaying.duration * this.props.nowPlaying.progress;
-    // console.log(this.props.nowPlaying.duration);
-    // console.log(this.props.nowPlaying.progress);
-    // let timeElapsedQueryUpdate = this.convertToYoutubeTimestamp(timeElapsed);
-    // console.log(timeElapsedQueryUpdate);
-    // this.setState({timeElapsedQuery:timeElapsedQueryUpdate})
   }
 
   //converts a time elapsed timestamp to a query string recognized by youtube
@@ -283,9 +254,9 @@ class VideoContainer extends React.Component {
     }
   }
 
+  //renders the video container
   render() {
     return (
-
       <ReactPlayer
         playing={this.props.nowPlaying.isPlaying}
         url={this.props.url}
@@ -295,28 +266,19 @@ class VideoContainer extends React.Component {
         progressFrequency={500}
         played={this.props.nowPlaying.progress}
         volume={this.props.volume}
-        controls={true}
+        controls={false}
       />
     );
   }
 }
 
-
+//Playback controls for the Radio Player
 class PlaybackControls extends React.Component {
   constructor(props) {
     super(props);
   }
 
-  /*
-   play
-   pause
-   step-backward
-   step-forward
-
-   volume-up
-   volume-down
-   volume-off
-   */
+  //renders the playback controls
   render() {
 
     const iconStyle = {
@@ -370,7 +332,6 @@ class PlaybackControls extends React.Component {
       </div>
     );
   }
-
 }
 
 export default RadioPlayer;
