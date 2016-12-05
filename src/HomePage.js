@@ -43,6 +43,11 @@ class Page extends React.Component{
         label="Cancel"
         primary={true}
         onTouchTap={this.handleClose}
+    />,
+    <FlatButton
+        label="Create"
+        primary={true}
+        onClick={(event) => this.goToRoom(event)}
     />
     ];
 
@@ -65,14 +70,6 @@ class Page extends React.Component{
                 floatingLabelText="Create Personal Radio room"
                 id='text'
                 onChange={this.handleChange}
-              />
-              </MuiThemeProvider>
-
-              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <FlatButton
-                  label="eh"
-                  primary={true}
-                  onClick={(event) => this.goToRoom(event)}
               />
               </MuiThemeProvider>
             </Dialog>
