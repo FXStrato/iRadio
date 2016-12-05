@@ -208,7 +208,7 @@ class SignUpForm extends React.Component {
                 </MuiThemeProvider>
               </div>
               <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                <RaisedButton label="Sign Up" disabled={buttonDisabled} onTouchTap={(e) => {this.signUp(e)}}/>
+                <RaisedButton label="Sign Up" labelStyle={!buttonDisabled ? {color: '#fff'} : {}} disabled={buttonDisabled} primary={true} onTouchTap={(e) => {this.signUp(e)}}/>
               </MuiThemeProvider>
             </form>
           </Col>
