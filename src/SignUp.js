@@ -1,7 +1,11 @@
 import React from 'react';
+import {TextField, RaisedButton} from 'material-ui';
 //import {Link} from 'react-router';
 import firebase from 'firebase';
-//import md5 from 'js-md5';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+
 
 /**
  * A form for signing up and logging into a website.
@@ -17,6 +21,10 @@ class SignUpForm extends React.Component {
       'password': undefined,
       'match':undefined,//find a match password
       'user':undefined,
+      emailvalidate: false,
+      passwordvalidate: false,
+      matchvalidate: false,
+      uservalidate: false
     };
 
     //function binding
@@ -36,10 +44,14 @@ class SignUpForm extends React.Component {
   //handle signUp button
   signUp(event) {
     event.preventDefault(); //don't submit
-    this.signUpCallback(this.state.email, this.state.user, this.state.password, this.state.match);
+    if(!this.state.email) {
+      alert('Please fill out the form first!');
+    } else {
+      this.signUpCallback(this.state.email, this.state.user, this.state.password);
+    }
   }
 
-  signUpCallback(email, handle, password, match) {
+  signUpCallback(email, handle, password) {
     /* Create a new user and save their information */
 
     firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -59,7 +71,7 @@ class SignUpForm extends React.Component {
           avatar:'https://www.gravatar.com/avatar/'
         }
         var userPromise = userRef.set(userData); //update entry in JOITC, return promise for chaining
-        return Promise.all(profilePromise, userPromise); //do both at once!
+        //return Promise.all(profilePromise, userPromise); //do both at once!
       })
 
   }
@@ -126,36 +138,66 @@ class SignUpForm extends React.Component {
     return errors; //return data object
   }
 
-  render() {
-    //field validation
-    var emailErrors = this.validate(this.state.email, {required:true, email:true});
-    var passwordErrors = this.validate(this.state.password, {required:true, minLength:6, password:true});
-    var matchErrors = this.validate(this.state.match, {required:true, passwordInput:this.state.password})//check match error
-    var handleErrors = this.validate(this.state.user, {required:true, minLength:3});
+  handleEmailValidate = (event) => {
+    this.handleChange(event);
+    let errors = this.validate(event.target.value, {required:true, email:true});
+    this.setState({emailvalidate: errors.isValid})
+  }
 
-    //button validation
-    var signUpEnabled = (emailErrors.isValid && passwordErrors.isValid && handleErrors.isValid && matchErrors.isValid);
+  handlePasswordValidate = (event) => {
+    this.handleChange(event);
+    let errors = this.validate(event.target.value, {required:true, minLength:6, password:true});
+    this.setState({passwordvalidate: errors.isValid})
+  }
+
+  handleMatchValidate = (event) => {
+    this.handleChange(event);
+    let errors = this.validate(event.target.value, {required:true, passwordInput:this.state.password})
+    this.setState({matchvalidate: errors.isValid})
+  }
+
+  handleUserValidate = (event) => {
+    this.handleChange(event);
+    let errors = this.validate(event.target.value, {required:true, minLength:3});
+    this.setState({uservalidate: errors.isValid});
+  }
+
+  render() {
+    let buttonDisabled;
+    if(this.state.uservalidate && this.state.passwordvalidate && this.state.matchvalidate && this.state.emailvalidate) {
+      //Everything is valid
+      buttonDisabled = false;
+    } else {
+      buttonDisabled = true;
+    }
 
     return (
       <div className="container">
         <h1>Sign Up Here!</h1>
-        <form role="form" className="sign-up-form">
-
-          <ValidatedInput field="email" type="email" label="Email" changeCallback={this.handleChange} errors={emailErrors} />
-
-          <ValidatedInput field="user" type="text" label="User" changeCallback={this.handleChange} errors={handleErrors} />
-
-          <ValidatedInput field="password" type="password" label="Password" changeCallback={this.handleChange} errors={passwordErrors} />
-
-
-          <ValidatedInput field="match" type="password" label="Confirm Password" changeCallback={this.handleChange} errors={matchErrors} />
-
-          {/* full html for the URL (because image) */}
-
-          <div className="form-group sign-up-buttons">
-            <button className="btn btn-primary" disabled={!signUpEnabled} onClick={(e) => this.signUp(e)}>Sign-up</button>
-            {/*<p> Already have an account?<Link to="/login" activeClassName="activeLink">SIGN IN</Link></p>*/}
+        <form role="form">
+          <div className="form-group">
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+              <TextField id="signin-email" style={{color: '#039BE5'}} floatingLabelText="Email" name="email" type="email" onChange={this.handleEmailValidate} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
+            </MuiThemeProvider>
           </div>
+          <div className="form-group">
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+              <TextField id="signin-user" style={{color: '#039BE5'}} floatingLabelText="User Handle" name="user" type="text" onChange={this.handleUserValidate} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length':''} />
+            </MuiThemeProvider>
+          </div>
+          <div className="form-group">
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+              <TextField id="signin-password" style={{color: '#039BE5'}} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
+            </MuiThemeProvider>
+          </div>
+          <div className="form-group">
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+              <TextField id="signin-user" style={{color: '#039BE5'}} floatingLabelText="Confirm Password" name="match" type="password" onChange={this.handleMatchValidate} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
+            </MuiThemeProvider>
+          </div>
+          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+            <RaisedButton label="Sign Up" disabled={buttonDisabled} onTouchTap={(e) => {this.signUp(e)}}/>
+          </MuiThemeProvider>
         </form>
       </div>
     );
@@ -202,31 +244,4 @@ class ValidationErrors extends React.Component {
   }
 }
 
-
-//simple wrapper for displaying the form
-class SignUpApp extends React.Component {
-
-  //basic callbacks to prove things work!
-  signUp(email, password, user) {
-    window.alert("Signing up:", email, 'with handle', user);
-  }
-
-  signIn(email, password) {
-    window.alert("Signing in:", email);
-  }
-
-  render() {
-    return (
-      <div className="container">
-        <header>
-          <h1>Sign Up!</h1>
-        </header>
-        <SignUpForm signUpCallback={this.signUp} signInCallback={this.signIn} />
-      </div>
-    );
-  }
-}
-
-
-export { SignUpApp, SignUpForm}; //for testing/demonstration
 export default SignUpForm;
