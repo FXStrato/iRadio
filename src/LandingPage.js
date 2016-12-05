@@ -9,6 +9,7 @@ import {Link, hashHistory} from 'react-router';
 import SignInForm from './SignIn.js';
 import SignUpForm from './SignUp.js'
 
+
 class LandingPage extends React.Component {
 
   render() {
@@ -80,13 +81,13 @@ class Login extends React.Component {
         <Tabs>
           <Tab label="SignUp">
             <div>
-              //<h2 style={styles.headline}>Sign Up</h2>
+              {/*<h2 style={styles.headline}>Sign Up</h2>*/}
               <SignUpForm />
             </div>
           </Tab>
           <Tab label="SignIn">
             <div>
-              //<h2 style={styles.headline}>Sign In</h2>
+              {/*<h2 style={styles.headline}>Sign In</h2>*/}
               <SignInForm />
             </div>
           </Tab>
