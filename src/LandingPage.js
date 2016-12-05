@@ -42,6 +42,9 @@ class LandingPage extends React.Component {
         <Col s={12}>
           {content}
         </Col>
+        <Col s={12}>
+          <p>Continue as guest</p>
+        </Col>
       </Row>
     );
   }
