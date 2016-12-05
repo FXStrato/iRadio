@@ -11,7 +11,7 @@ import SignInForm from './SignIn.js';
 import SignUpForm from './SignUp.js'
 
 
-//This component will need an auth listener; if the user is authed, then they shouldn't see sign in or sign up options, but create or join rooms.
+//TODO: In join room, check to make sure they aren't joining a nonexisting room
 
 class LandingPage extends React.Component {
   state = {
@@ -32,7 +32,7 @@ class LandingPage extends React.Component {
       this.setState({userEmail:user.email})
       //Check to see if they have made a room already
       firebase.database().ref('channels/jeff').once('value').then(snapshot => {
-        if(snapshot.val().owner) {
+        if(snapshot.val()) {
           this.setState({roomMade: true})
         } else {
           this.setState({roomMade: false})
@@ -169,6 +169,7 @@ componentWillUnmount() {
                 floatingLabelText="Room ID"
                 id='joinroom-input'
                 onChange={this.handleChange}
+                required
               />
               </MuiThemeProvider>}
            </Dialog>

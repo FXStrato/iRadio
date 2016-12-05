@@ -41,7 +41,8 @@ class Room extends Component {
             <h1 className="center-align">Search</h1>
             <Search
               apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-              callback={this.searchCallback} />
+              callback={this.searchCallback}
+              room={this.state.roomID} />
           </Col>
         </Row>
       </div>
