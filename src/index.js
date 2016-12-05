@@ -4,6 +4,7 @@ import App from './App';
 import './index.css';
 import firebase from 'firebase';
 
+  localStorage.setItem("updated", JSON.stringify(false));
 
   // Initialize Firebase
   var config = {

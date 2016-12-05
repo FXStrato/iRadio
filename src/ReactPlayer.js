@@ -8,6 +8,7 @@ import firebase from 'firebase';
 injectTapEventPlugin();
 
 
+
 //eventually we're going to want to change all of the setStates to save to Firebase refs
 class RadioPlayer extends React.Component {
 
@@ -20,6 +21,7 @@ class RadioPlayer extends React.Component {
         queue:{},
         volume: 0.75
       };
+
   }
 
   componentDidMount() {
@@ -29,6 +31,8 @@ class RadioPlayer extends React.Component {
     //var channelId = this.props.channelId;
     let channelId = "evanTest";
     let refPath = "channels/" + channelId;
+
+
 
     let channelRef = firebase.database().ref(refPath);
     channelRef.on("value", (snapshot) => {
@@ -42,7 +46,7 @@ class RadioPlayer extends React.Component {
       let nowPlayingInstance = channelObject.nowPlaying;
       newState.nowPlaying = nowPlayingInstance;
       this.setState(newState);
-    });
+    })
   }
 
   handlePlayPauseClick = () => {
@@ -55,6 +59,9 @@ class RadioPlayer extends React.Component {
   };
 
   handleForwardClick = () => {
+
+    this.localUrl = null;
+
     var refPath = "channels/evanTest";
     var queueRef = firebase.database().ref(refPath + "/queue");
 
@@ -79,6 +86,7 @@ class RadioPlayer extends React.Component {
 
     var newNowPlaying = {
         url: newTrack.url,
+        baseUrl: newTrack.url,
         duration: newTrack.duration,
         progress: 0,
         isPlaying: true,
@@ -96,6 +104,7 @@ class RadioPlayer extends React.Component {
     var reset = {
       key: "evanTest",
       nowPlaying: {
+        baseUrl: "https://www.youtube.com/watch?v=phn2JZ2xTz4",
         url: "https://www.youtube.com/watch?v=phn2JZ2xTz4",
         duration: 241,
         title: "save our souls",
@@ -137,16 +146,18 @@ class RadioPlayer extends React.Component {
     if (!this.state.seeking) {
       console.log(state);
       if(state.hasOwnProperty("played")){
-        console.log(state);
+        if(this.state.nowPlaying.progress - state["played"] > 0.05) {
+          console.log("I'm behind!");
+          this.forceUpdate();
 
-        var newNowPlayingState = this.state.nowPlaying;
-        newNowPlayingState.progress = state["played"];
-        console.log(newNowPlayingState);
-        var timeElapsed = newNowPlayingState.duration * newNowPlayingState.progress;
-        newNowPlayingState.url += "" + this.convertToYoutubeTimestamp(timeElapsed);
-        //TODO update firebase instead of state here
-        //this.setState({nowPlaying:newNowPlayingState});
-        firebase.database().ref("channels/evanTest/nowPlaying").set(newNowPlayingState);
+        } else {
+          console.log("I'm the leader!");
+          var newNowPlayingState = this.state.nowPlaying;
+          newNowPlayingState.progress = state["played"];
+          this.setState(newNowPlayingState);
+          firebase.database().ref("channels/evanTest/nowPlaying").set(newNowPlayingState);
+        }
+
       }
     }
   };
@@ -189,12 +200,32 @@ class RadioPlayer extends React.Component {
   };
 
   render() {
+    var updated = JSON.parse(localStorage.getItem("updated"));
+
+    var urlToInput = this.state.nowPlaying.baseUrl;
+    var tempUrl = JSON.parse(localStorage.getItem("tempUrl"));
+
+    if(!updated && this.state.nowPlaying.progress) {
+      console.log(tempUrl);
+      if((tempUrl === null || tempUrl === undefined) ) {
+        var timeOfCurrentVideo = this.state.nowPlaying.progress * this.state.nowPlaying.duration;
+        tempUrl = this.state.nowPlaying.baseUrl + this.convertToYoutubeTimestamp(timeOfCurrentVideo);
+        localStorage.setItem("tempUrl",JSON.stringify(tempUrl));
+      }
+      urlToInput = tempUrl;
+      localStorage.setItem("updated", JSON.stringify(true));
+    } else if(tempUrl) {
+      urlToInput = tempUrl;
+    }
+    console.log(urlToInput);
+
     return (
       <div>
         <VideoContainer
           onProgress={this.onProgress}
           onDuration={this.onDuration}
           onVideoEnd={this.onVideoEnd}
+          url={urlToInput}
           nowPlaying={this.state.nowPlaying}
           volume={this.state.volume}
         />
@@ -253,12 +284,11 @@ class VideoContainer extends React.Component {
   }
 
   render() {
-    let url = this.state.timeElapsedQuery;
-    console.log(this.props.nowPlaying.url);
     return (
+
       <ReactPlayer
         playing={this.props.nowPlaying.isPlaying}
-        url={this.props.nowPlaying.url}
+        url={this.props.url}
         onProgress={this.props.onProgress}
         onDuration={this.props.onDuration}
         onEnded={this.props.onVideoEnd}
