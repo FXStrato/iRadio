@@ -43,7 +43,7 @@ class SignInForm extends React.Component{
   render() {
 
     return (
-      <div className="container">
+      <div>
         <Row>
           <Col s={12} m={6} l={6}>
             <h1>Sign In Here!</h1>

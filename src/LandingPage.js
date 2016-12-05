@@ -11,7 +11,7 @@ import SignInForm from './SignIn.js';
 import SignUpForm from './SignUp.js'
 
 
-//This component will need an auth listener; if the user is authed, then they shouldn't see sign in or sign up options, but create or join rooms.
+//TODO: In join room, check to make sure they aren't joining a nonexisting room
 
 class LandingPage extends React.Component {
   state = {
@@ -19,6 +19,7 @@ class LandingPage extends React.Component {
     open: false,
     createDialog: false,
     roomName: '',
+    errorText: '',
     userEmail: 'init',
     userID: 'init',
     roomMade: null
@@ -32,7 +33,7 @@ class LandingPage extends React.Component {
       this.setState({userEmail:user.email})
       //Check to see if they have made a room already
       firebase.database().ref('channels/jeff').once('value').then(snapshot => {
-        if(snapshot.val().owner) {
+        if(snapshot.val()) {
           this.setState({roomMade: true})
         } else {
           this.setState({roomMade: false})
@@ -60,10 +61,14 @@ componentWillUnmount() {
   handleChange = event => {
     var value = event.target.value;
     this.setState({roomName:value});
+    if(this.state.errorText !== '') {
+      this.setState({errorText: ''});
+    }
   }
 
   handleClose = () => {
     this.setState({open: false});
+    this.setState({errorText: ''})
   };
 
   handleOpen = isCreate => {
@@ -82,7 +87,6 @@ componentWillUnmount() {
   }
 
   handleAction = () => {
-    this.handleClose();
     //if creating, init room. Dummy data is inserted for now. Else, join the given room
     if(this.state.createDialog) {
       let roomRef = firebase.database().ref('channels/jeff');
@@ -100,10 +104,18 @@ componentWillUnmount() {
       })
       roomRef.off();
       this.auth();
+      this.handleClose();
       hashHistory.push('room/jeff');
     } else {
       //Need to run a check if room exists here.
-      hashHistory.push('room/' + this.state.roomName);
+      let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
+        if(snapshot.val()) {
+          //True, means the room exists
+          hashHistory.push('room/' + this.state.roomName);
+        } else {
+          this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
+        }
+      });
     }
 
   }
@@ -155,7 +167,7 @@ componentWillUnmount() {
     }
 
     return (
-      <div>
+      <div className="container">
         {content}
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
            <Dialog
@@ -169,6 +181,7 @@ componentWillUnmount() {
                 floatingLabelText="Room ID"
                 id='joinroom-input'
                 onChange={this.handleChange}
+                errorText={this.state.errorText}
               />
               </MuiThemeProvider>}
            </Dialog>
