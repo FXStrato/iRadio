@@ -1,6 +1,7 @@
 /*eslint no-unused-vars: "off"*/ //don't show warnings for unused
 import React from 'react';
 import {TextField, RaisedButton} from 'material-ui';
+import {Row, Col} from 'react-materialize';
 //import {Link} from 'react-router';
 import firebase from 'firebase';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -116,6 +117,14 @@ class SignUpForm extends React.Component {
         }
       }
 
+      if(validations.user) {
+        valid = !/[^a-zA-Z0-9]/.test(value)
+        if(!valid) {
+          errors.isValid = false;
+          errors.specialcharacters = true;
+        }
+      }
+
       //handle password type
       if(validations.password){
         valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
@@ -159,7 +168,7 @@ class SignUpForm extends React.Component {
 
   handleUserValidate = (event) => {
     this.handleChange(event);
-    let errors = this.validate(event.target.value, {required:true, minLength:3});
+    let errors = this.validate(event.target.value, {required:true, minLength:3, user:true});
     this.setState({uservalidate: errors.isValid});
   }
 
@@ -174,72 +183,36 @@ class SignUpForm extends React.Component {
 
     return (
       <div className="container">
-        <h1>Sign Up Here!</h1>
-        <form role="form">
-          <div className="form-group">
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField id="signin-email" style={{color: '#039BE5'}} floatingLabelText="Email" name="email" type="email" onChange={this.handleEmailValidate} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
-            </MuiThemeProvider>
-          </div>
-          <div className="form-group">
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField id="signin-user" style={{color: '#039BE5'}} floatingLabelText="User Handle" name="user" type="text" onChange={this.handleUserValidate} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length':''} />
-            </MuiThemeProvider>
-          </div>
-          <div className="form-group">
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField id="signin-password" style={{color: '#039BE5'}} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
-            </MuiThemeProvider>
-          </div>
-          <div className="form-group">
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField id="signin-user" style={{color: '#039BE5'}} floatingLabelText="Confirm Password" name="match" type="password" onChange={this.handleMatchValidate} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
-            </MuiThemeProvider>
-          </div>
-          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-            <RaisedButton label="Sign Up" disabled={buttonDisabled} onTouchTap={(e) => {this.signUp(e)}}/>
-          </MuiThemeProvider>
-        </form>
-      </div>
-    );
-  }
-}
-
-//A component that displays an input form with validation styling
-//props are: field, type, label, changeCallback, errors
-class ValidatedInput extends React.Component {
-  render() {
-    //<Textfield id={this.props.field} type={this.props.type} label={this.props.field} floatingLabel style={{width: '200px'}} onChange={this.props.changeCallback}/>
-    return (
-      <div className={"form-group "+this.props.errors.style}>
-        <label htmlFor={this.props.field} className="control-label">{this.props.label}</label>
-        <input id={this.props.field} type={this.props.type} name={this.props.field} className="input" onChange={this.props.changeCallback} />
-        <ValidationErrors errors={this.props.errors} />
-      </div>
-    );
-  }
-}
-
-//a component to represent and display validation errors
-class ValidationErrors extends React.Component {
-  render() {
-    return (
-      <div>
-        {this.props.errors.required &&
-          <p className="help-block">Required!</p>
-        }
-        {this.props.errors.email &&
-          <p className="help-block">Not an email address!</p>
-        }
-        {this.props.errors.minLength &&
-          <p className="help-block">Must be at least {this.props.errors.minLength} characters.</p>
-        }
-        {this.props.errors.passwordInput &&
-          <p className="help-block">Must match with the previous password</p>
-        }
-        {this.props.errors.password &&
-          <p className="help-block">Must contain a digit and a alpha with size 6-15</p>
-        }
+        <Row>
+          <Col s={12} m={6} l={6}>
+            <h1>Sign Up Here!</h1>
+            <form role="form">
+              <div className="form-group">
+                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                  <TextField id="signin-email" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={this.handleEmailValidate} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
+                </MuiThemeProvider>
+              </div>
+              <div className="form-group">
+                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                  <TextField id="signin-user" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="User Handle" name="user" type="text" onChange={this.handleUserValidate} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length and not contain special characters or spaces':''} />
+                </MuiThemeProvider>
+              </div>
+              <div className="form-group">
+                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                  <TextField id="signin-password" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
+                </MuiThemeProvider>
+              </div>
+              <div className="form-group">
+                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                  <TextField id="signin-user" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Confirm Password" name="match" type="password" onChange={this.handleMatchValidate} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
+                </MuiThemeProvider>
+              </div>
+              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <RaisedButton label="Sign Up" disabled={buttonDisabled} onTouchTap={(e) => {this.signUp(e)}}/>
+              </MuiThemeProvider>
+            </form>
+          </Col>
+        </Row>
       </div>
     );
   }

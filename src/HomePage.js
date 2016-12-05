@@ -76,8 +76,6 @@ class Page extends React.Component{
           </MuiThemeProvider>
         <h2 className="center-align">Search</h2>
         </div>
-
-
     )
   }
 }

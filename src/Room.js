@@ -6,6 +6,8 @@ class Room extends React.Component{
     super(props);
   }
 
+
+
   render(){
     var user = firebase.auth().currentUser;
     console.log('user', user);
