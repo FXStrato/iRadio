@@ -20,8 +20,8 @@ class App extends Component {
   }
 
   //Callback to handle search results
-  searchCallback = (id, duration, thumbnail) => {
-    console.log(id);
+  searchCallback = result => {
+    console.log(result);
   }
 
   render() {
@@ -29,14 +29,14 @@ class App extends Component {
     return (
       <div>
         <header>
-
+          <Navbar/>
         </header>
         <main className="container">
-          <Link to="/landing-page"><LandingPage /></Link>
-          <h1 className="center-align">Search</h1>
-          <Link to="/search"><Search
+          <LandingPage />
+          {/* <h1 className="center-align">Search</h1>
+          <Search
             apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-            callback={this.searchCallback} /></Link>
+            callback={this.searchCallback} /> */}
         </main>
         <footer>
 
@@ -44,6 +44,33 @@ class App extends Component {
       </div>
     );
   }
+}
+
+class Navbar extends Component {
+
+  handleClick = () => {
+    console.log("iRadio");
+  };
+
+  render() {
+
+    const styles = {
+      title: {
+        cursor: 'pointer',
+      },
+    };
+
+    return (
+      <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+        <AppBar
+          title={<span style={styles.title}>iRadio</span>}
+          onTitleTouchTap={this.handleClick()}
+          iconElementRight={<FlatButton label="User" />}
+        />
+      </MuiThemeProvider>
+    );
+  };
+
 }
 
 export default App;
