@@ -8,6 +8,7 @@ import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {Link, hashHistory} from 'react-router';
 import SignInForm from './SignIn.js';
 import SignUpForm from './SignUp.js'
+import Guest from './Guest.js';
 
 //This component will need an auth listener; if the user is authed, then they shouldn't see sign in or sign up options, but create or join rooms.
 
@@ -43,7 +44,7 @@ class LandingPage extends React.Component {
           {content}
         </Col>
         <Col s={12}>
-          <p>Continue as guest</p>
+          <Guest />
         </Col>
       </Row>
     );
