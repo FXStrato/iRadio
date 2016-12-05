@@ -8,9 +8,10 @@ class Room extends React.Component{
           <div>
             <h3>Begin your Music Jounery</h3>
             <p> room</p>
+            <h1 className="center-align">Search</h1>
             <Search
-            apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-            callback={this.searchCallback} />
+              apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
+              callback={this.searchCallback} />
           </div>
         )
     }
