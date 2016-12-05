@@ -1,5 +1,25 @@
 body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+  background-color: #212121 !important;
+}
+
+/* label focus color */
+input:focus + label {
+   opacity: 0;
+   color: white !important;
+ }
+ /* label underline focus color */
+ input:focus {
+   border-bottom: none !important;
+   box-shadow: none !important;
+ }
+
+
+h1 {
+  font-size: 3rem;
+  color: #fff;
+}
+
+h2 {
+  font-size: 2.5rem;
+  color: #fff;
 }
