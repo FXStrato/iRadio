@@ -7,6 +7,7 @@ import firebase from 'firebase';
 //fix an onTapEvent issue with react
 injectTapEventPlugin();
 
+
 //eventually we're going to want to change all of the setStates to save to Firebase refs
 class RadioPlayer extends React.Component {
 
@@ -14,13 +15,9 @@ class RadioPlayer extends React.Component {
     super(props);
     this.state =
       {
-        nowPlaying: {
-          // isPlaying: false,
-          // url: "",
-          // progress: 0,
-          // duration: 200
+        nowPlaying:{
         },
-        tracks: [],
+        queue:{},
         volume: 0.75
       };
   }
@@ -33,69 +30,146 @@ class RadioPlayer extends React.Component {
     let channelId = "evanTest";
     let refPath = "channels/" + channelId;
 
-    //TODO break this up into tracks ref and queue ref and do the things necessary for each
-
-    let thisChannelRef = firebase.database().ref(refPath);
-
-    thisChannelRef.on("value", (snapshot) => {
-      let queueInstance = snapshot.child("queue").val();
-      let nowPlayingInstance = snapshot.child("nowPlaying").val();
-      let roomQueue = [];
+    let channelRef = firebase.database().ref(refPath);
+    channelRef.on("value", (snapshot) => {
+      var channelObject = snapshot.val();
+      let queueInstance = channelObject.queue;
       for(let track in queueInstance) {
-        roomQueue.push(queueInstance[track]);
+        queueInstance[track].key = track;
       }
-      this.setState({tracks:roomQueue, nowPlaying:nowPlayingInstance});
+      var newState = this.state;
+      newState.queue = queueInstance;
+      let nowPlayingInstance = channelObject.nowPlaying;
+      newState.nowPlaying = nowPlayingInstance;
+      this.setState(newState);
     });
-
-
-
   }
 
   handlePlayPauseClick = () => {
     console.log("I've been clicked! -- Play Pause");
     //TODO toggle the classNames so that 'fa fa-pause' is the new classname
-    let togglePlaying = !this.state.isPlaying;
-    //update firebase instead of state here
-    this.setState({isPlaying: togglePlaying});
+    var thisState = this.state.nowPlaying;
+    thisState.isPlaying = !this.state.nowPlaying.isPlaying;
+    var nowPlayingRef = firebase.database().ref("channels/evanTest/nowPlaying");
+    nowPlayingRef.set(thisState);
   };
 
   handleForwardClick = () => {
-    console.log("I've been clicked! -- Forward");
-    let shiftedTracks = this.state.tracks;
-    if(this.state.isLooping) {
-      shiftedTracks.unshift(this.state.nowPlaying.url);
-    }
-    let newUrl = this.state.tracks[0].url;
-    shiftedTracks.shift();
-    let newState = {
-      url: newUrl,
-      tracks: shiftedTracks
-    };
-    //update firebase instead of state here
-    this.setState(newState);
+    var refPath = "channels/evanTest";
+    var queueRef = firebase.database().ref(refPath + "/queue");
+
+    var newTrack = {};
+
+    queueRef.orderByKey().limitToFirst(1)
+      .once("value", (snapshot) => {
+        var newTrackContainer = snapshot.val();
+        for (var track in newTrackContainer) {
+          newTrack = newTrackContainer[track];
+          newTrack.key = track;
+        }
+      });
+
+    //removes the child
+    firebase.database().ref(refPath + "/queue/" + newTrack.key).remove();
+
+    var newQueue = {};
+    queueRef.once("value", (snapshot) => {
+      newQueue = snapshot.val();
+    });
+
+    var newNowPlaying = {
+        url: newTrack.url,
+        duration: newTrack.duration,
+        progress: 0,
+        isPlaying: true,
+        title: newTrack.title
+      };
+
+    var nowPlayingRef = firebase.database().ref(refPath );
+    nowPlayingRef.child("nowPlaying").set(newNowPlaying);
   };
 
   handleBackwardClick = () => {
     console.log("I've been clicked! -- Backward");
     //TODO let's implement this last
+
+    var reset = {
+      key: "evanTest",
+      nowPlaying: {
+        url: "https://www.youtube.com/watch?v=phn2JZ2xTz4",
+        duration: 241,
+        title: "save our souls",
+        progress:0,
+        isPlaying:true
+      },
+      queue: {
+        songId1: {
+          url: "https://www.youtube.com/watch?v=Zasx9hjo4WY",
+          title: "zedd ignite",
+          duration: 227
+        },
+        songId2: {
+          url: "https://www.youtube.com/watch?v=B7xai5u_tnk",
+          title: "fatrat monody",
+          duration: 290
+        },
+        songId3: {
+          url: "https://www.youtube.com/watch?v=dXHVuIqGzSU",
+          title: "aftergold big wild",
+          duration: 230
+        }
+      }
+    }
+
+    var queueRef = firebase.database().ref("channels/evanTest");
+    queueRef.set(reset);
+
   };
 
-  handleLoopClick = () => {
-    let toggleLooping = !this.state.isLooping;
-    //TODO update firebase instead of state here
-    this.setState({isLooping:toggleLooping});
-  };
+  // handleLoopClick = () => {
+  //   let toggleLooping = !this.state.isLooping;
+  //   //TODO update firebase instead of state here
+  //   this.setState({isLooping:toggleLooping});
+  // };
 
   onProgress = state => {
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
       console.log(state);
       if(state.hasOwnProperty("played")){
+        console.log(state);
+
         var newNowPlayingState = this.state.nowPlaying;
         newNowPlayingState.progress = state["played"];
+        console.log(newNowPlayingState);
+        var timeElapsed = newNowPlayingState.duration * newNowPlayingState.progress;
+        newNowPlayingState.url += "" + this.convertToYoutubeTimestamp(timeElapsed);
         //TODO update firebase instead of state here
         //this.setState({nowPlaying:newNowPlayingState});
+        firebase.database().ref("channels/evanTest/nowPlaying").set(newNowPlayingState);
       }
+    }
+  };
+
+  convertToYoutubeTimestamp = timeElapsed => {
+    var hours = "";
+    if(timeElapsed > 3600) {
+      hours = "" + (parseInt(timeElapsed / 3600)) + "h";
+      timeElapsed %= 3600;
+    }
+    var minutes = "";
+    if(timeElapsed > 60) {
+      minutes =  "" + parseInt(timeElapsed / 60) + "m";
+      timeElapsed %= 60;
+    }
+    var seconds = "";
+    if(timeElapsed !== 0) {
+      seconds = "" + parseInt(timeElapsed) + "s";
+    }
+    if(hours || minutes || seconds) {
+      return "&t=" + hours + minutes + seconds;
+    } else {
+      return "";
     }
   };
 
@@ -104,36 +178,30 @@ class RadioPlayer extends React.Component {
   };
 
   handleVolumeChange = (e, value) => {
-    this.setState({volume:value});
+    //this.setState({volume:value});
   };
 
   onDuration = state => {
     // We only want to update time slider if we are not currently seeking
-    if (!this.state.seeking) {
-      this.setState({duration:state});
-    }
+    // if (!this.state.seeking) {
+    //   this.setState({duration:state});
+    // }
   };
 
   render() {
-
     return (
       <div>
         <VideoContainer
           onProgress={this.onProgress}
           onDuration={this.onDuration}
           onVideoEnd={this.onVideoEnd}
-          playing={this.state.isPlaying}
-          url={this.state.nowPlaying.url}
-          loop={this.state.nowPlaying.isLooping}
-          progress={this.state.nowPlaying.progress}
-          duration={this.state.nowPlaying.duration}
+          nowPlaying={this.state.nowPlaying}
           volume={this.state.volume}
         />
         <PlaybackControls
           playPauseCallback={this.handlePlayPauseClick}
           forwardCallback={this.handleForwardClick}
           backwardCallback={this.handleBackwardClick}
-          loopCallback={this.handleLoopClick}
           volumeCallback={this.handleVolumeChange}
         />
       </div>
@@ -153,15 +221,16 @@ class VideoContainer extends React.Component {
   }
 
   componentDidMount() {
-    let timeElapsed = this.props.duration * this.props.progress;
-    let timeElapsedQueryUpdate = this.convertToYoutubeTimestamp(timeElapsed);
-    this.setState({timeElapsedQuery:timeElapsedQueryUpdate})
+    // let timeElapsed = this.props.nowPlaying.duration * this.props.nowPlaying.progress;
+    // console.log(this.props.nowPlaying.duration);
+    // console.log(this.props.nowPlaying.progress);
+    // let timeElapsedQueryUpdate = this.convertToYoutubeTimestamp(timeElapsed);
+    // console.log(timeElapsedQueryUpdate);
+    // this.setState({timeElapsedQuery:timeElapsedQueryUpdate})
   }
 
   //converts a time elapsed timestamp to a query string recognized by youtube
   convertToYoutubeTimestamp(timeElapsed) {
-    console.log("time elapsed");
-    console.log(timeElapsed);
     var hours = "";
     if(timeElapsed > 3600) {
       hours = "" + (parseInt(timeElapsed / 3600)) + "h";
@@ -184,18 +253,17 @@ class VideoContainer extends React.Component {
   }
 
   render() {
-    let timeElapsedQuery = this.convertToYoutubeTimestamp(this.props.progress * this.props.duration);
-    let url = this.props.url + timeElapsedQuery;
-    console.log(url);
+    let url = this.state.timeElapsedQuery;
+    console.log(this.props.nowPlaying.url);
     return (
       <ReactPlayer
-        playing={this.props.playing}
-        url={url}
+        playing={this.props.nowPlaying.isPlaying}
+        url={this.props.nowPlaying.url}
         onProgress={this.props.onProgress}
         onDuration={this.props.onDuration}
         onEnded={this.props.onVideoEnd}
-        progressFrequency={1000}
-        played={this.props.progress}
+        progressFrequency={500}
+        played={this.props.nowPlaying.progress}
         volume={this.props.volume}
         controls={true}
       />
