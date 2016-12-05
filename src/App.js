@@ -68,7 +68,7 @@ class App extends Component {
               title={'iRadio'}
               onTitleTouchTap={this.goHome}
               titleStyle={{cursor: 'pointer'}}
-              iconElementRight={<FlatButton label={this.state.userEmail ? "Sign Out" : "Not logged In"} onTouchTap={this.state.userID ? this.signOut : this.goHome} />}
+              iconElementRight={<FlatButton label={this.state.userEmail ? this.state.userEmail + " | Sign Out" : "Not logged In"} onTouchTap={this.state.userID ? this.signOut : this.goHome} />}
             />
           </MuiThemeProvider>
         </header>
