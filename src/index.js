@@ -4,6 +4,7 @@ import firebase from 'firebase';
 import {Router, Route, hashHistory, IndexRoute} from 'react-router';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import App from './App';
+import Room from './Room';
 import '../node_modules/materialize-css/dist/css/materialize.min.css';
 import './index.css';
 
@@ -27,13 +28,16 @@ ReactDOM.render(
   <Router history={hashHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={LandingPage} />
+<<<<<<< HEAD
         <Route path="landing-page" component={LandingPage} />
         <Route path="home" component={Page} />
         <Route path="room" component={Room} >
           <Route path=":roomName" component={Room} />
         </Route>
+=======
+      <Route path="room/:roomID" component={Room}/>
+>>>>>>> 96186ba41e588011748c8346a7093bd22e9e7384
     </Route>
   </Router>,
-
   document.getElementById('root')
 );

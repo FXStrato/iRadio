@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "off"*/ //don't show warnings for unused
 import React from 'react';
 import {TextField, RaisedButton} from 'material-ui';
 //import {Link} from 'react-router';
@@ -10,10 +11,9 @@ import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 class SignInForm extends React.Component{
   constructor(props){
     super(props);
-
     this.state = {
-      'email': undefined,
-      'password': undefined,
+      email: undefined,
+      password: undefined,
     };
     //function binding
     this.handleChange = this.handleChange.bind(this);
@@ -28,7 +28,7 @@ class SignInForm extends React.Component{
   }
 
   //handle signIn button
-  signIn(event) {
+  signIn = event => {
     event.preventDefault(); //don't submit
     this.signInCallback(this.state.email, this.state.password);
   }
@@ -47,17 +47,17 @@ class SignInForm extends React.Component{
         <form role="form">
           <div className="form-group">
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField style={{color: '#039BE5'}} floatingLabelText="Email" type="email" onChange={this.handleChange} />
+              <TextField style={{color: '#039BE5'}} floatingLabelText="Email" type="email" name="email" onChange={(e) => {this.handleChange(e)}} />
             </MuiThemeProvider>
           </div>
           <div className="form-group">
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField style={{color: '#039BE5'}} floatingLabelText="Password" type="password" onChange={this.handleChange}/>
+              <TextField style={{color: '#039BE5'}} floatingLabelText="Password" type="password" name="password" onChange={(e) => {this.handleChange(e)}}/>
             </MuiThemeProvider>
           </div>
           <div className="form-group">
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton label="Sign In" onTouchTap={this.SignIn}/>
+              <RaisedButton label="Sign In" onTouchTap={this.signIn}/>
             </MuiThemeProvider>
           </div>
         </form>
