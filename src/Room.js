@@ -27,7 +27,7 @@ class Room extends React.Component{
     //console.log('user', firebase.auth().currentUser.uid);
     return(
       <div className="input">
-        <h3>Begin your Music Jounery</h3>
+        <h3>Begin your Music Journey</h3>
         <h4>{this.props.params.roomName} Room</h4>
       </div>
     )
