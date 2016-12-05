@@ -44,11 +44,7 @@ class App extends Component {
           <Navbar/>
         </header>
         <main className="container">
-          <LandingPage />
-          {/* <h1 className="center-align">Search</h1>
-          <Search
-            apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-            callback={this.searchCallback} /> */}
+          {this.props.children}
         </main>
         <footer>
 

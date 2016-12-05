@@ -8,7 +8,7 @@ import '../node_modules/materialize-css/dist/css/materialize.min.css';
 import './index.css';
 
 import LandingPage from './LandingPage.js';
-
+import Page from './HomePage';
 
 // Needed for onTouchTap
 injectTapEventPlugin();
@@ -26,8 +26,8 @@ ReactDOM.render(
   <Router history={hashHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={LandingPage} />
-        <Route path="LandingPage" component={LandingPage}>
-        </Route>
+        <Route path="landing-page" component={LandingPage} />
+        <Route path="home" component={Page} />
     </Route>
   </Router>,
 
