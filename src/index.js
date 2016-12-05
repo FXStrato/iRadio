@@ -7,12 +7,13 @@ import App from './App';
 import Room from './Room';
 import '../node_modules/materialize-css/dist/css/materialize.min.css';
 import './index.css';
-
 import LandingPage from './LandingPage.js';
-
 
 // Needed for onTouchTap
 injectTapEventPlugin();
+
+// Needed for users joining in the middle of a song
+localStorage.setItem("updated", JSON.stringify(false));
 
 var config = {
   apiKey: "AIzaSyBVGyJq21xT2zRpbNMqBAtvq9haT7gMI08",

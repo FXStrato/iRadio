@@ -8,6 +8,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {Link, hashHistory} from 'react-router';
 import Search from './Search';
+import RadioPlayer from './ReactPlayer';
 
 
 
@@ -46,8 +47,8 @@ class Room extends Component {
                 <Row>
                   <br/>
                   <Col s={12}>
-                    <h1>Now Playing {this.state.nowPlaying.title}</h1>
-                    <img src={this.state.nowPlaying.thumbnail} alt={this.state.nowPlaying.title}/>
+                    <h1 className="center-align">Now Playing {this.state.nowPlaying.title}</h1>
+                    <RadioPlayer room={this.props.params.roomID}  />
                   </Col>
                 </Row>
               </div>

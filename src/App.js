@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import {Row, Col} from 'react-materialize';
 import {RaisedButton, FlatButton, Dialog, TextField, List, ListItem, AppBar} from 'material-ui';
 import _ from 'lodash';
+import RadioPlayer from './ReactPlayer';
 import Search from './Search';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
