@@ -43,13 +43,18 @@ class Page extends React.Component{
         label="Cancel"
         primary={true}
         onTouchTap={this.handleClose}
+    />,
+    <FlatButton
+        label="Create"
+        primary={true}
+        onTouchTap={(event) => this.goToRoom(event)}
     />
     ];
 
     return(
       <div>
       <h1>Welcome to iRadio</h1>
-      <p> -- Your personal space to share awesome music and video</p>   
+      <p> -- Your personal space to share awesome music and video</p>
           <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
             <RaisedButton label="Create Room" onTouchTap={this.handleOpen} />
           </MuiThemeProvider>
@@ -65,14 +70,6 @@ class Page extends React.Component{
                 floatingLabelText="Create Personal Radio room"
                 id='text'
                 onChange={this.handleChange}
-              />
-              </MuiThemeProvider>
-
-              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <FlatButton
-                  label="eh"
-                  primary={true}
-                  onClick={(event) => this.goToRoom(event)}
               />
               </MuiThemeProvider>
             </Dialog>

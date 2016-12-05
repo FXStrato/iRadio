@@ -9,6 +9,7 @@ import './index.css';
 
 import LandingPage from './LandingPage.js';
 import Page from './HomePage';
+import Room from './Room';
 
 // Needed for onTouchTap
 injectTapEventPlugin();
@@ -28,6 +29,9 @@ ReactDOM.render(
       <IndexRoute component={LandingPage} />
         <Route path="landing-page" component={LandingPage} />
         <Route path="home" component={Page} />
+        <Route path="room" component={Room} >
+          <Route path=":roomName" component={Room} />
+        </Route>
     </Route>
   </Router>,
 

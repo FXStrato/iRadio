@@ -28,10 +28,11 @@ class App extends Component {
       if(user) {
         console.log('Auth state changed: logged in as', user.email);
         this.setState({userId:user.uid});
+        hashHistory.push("home");
       } else {
         console.log('Auth state changed: logged out');
         this.setState({userId: null});
-        hashHistory.push('/login');
+        hashHistory.push("/landing-page");
       }
     })
   }
