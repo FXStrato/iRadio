@@ -2,13 +2,15 @@
 import React, {Component} from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {AppBar, FlatButton, Tabs, Tab, RaisedButton} from 'material-ui';
+import {AppBar, FlatButton, Tabs, Tab, RaisedButton, List, ListItem, Avatar} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {Link, hashHistory} from 'react-router';
 import Search from './Search';
 import RadioPlayer from './ReactPlayer';
+import _ from 'lodash';
+import {cyanA400, transparent} from 'material-ui/styles/colors';
 
 
 
@@ -17,7 +19,8 @@ class Room extends Component {
   state = {
     roomID: '',
     nowPlaying: {},
-    value: 'np'
+    value: 'np',
+    queue: []
   }
 
   componentDidMount = () => {
@@ -26,6 +29,17 @@ class Room extends Component {
     let roomRef = firebase.database().ref('channels/' + this.props.params.roomID).once('value').then(snapshot => {
       this.setState({nowPlaying: snapshot.val().nowPlaying});
     });
+    //set listener for queue
+    let queueRef = firebase.database().ref('channels/' + this.props.params.roomID + '/queue');
+    queueRef.on('value', snapshot => {
+      let temp = [];
+      snapshot.forEach(childsnap => {
+        let item = childsnap.val();
+        item.key = childsnap.key;
+        temp.push(item);
+      });
+      this.setState({queue: temp});
+    })
   }
 
   handleChange = value => {
@@ -39,6 +53,17 @@ class Room extends Component {
   }
 
   render() {
+    //Populate queue
+    let listcontent = _.map(this.state.queue, (elem, index) => {
+      return <ListItem
+        style={{cursor: 'default'}}
+        key={elem.key}
+        primaryText={elem.title}
+        secondaryText={elem.channel}
+        leftAvatar={<Avatar color={cyanA400} backgroundColor={transparent}>{index + 1}</Avatar>}
+      />
+    });
+
     return (
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
           <Tabs value={this.state.value} onChange={this.handleChange}>
@@ -47,7 +72,7 @@ class Room extends Component {
                 <Row>
                   <br/>
                   <Col s={12}>
-                    <h1 className="center-align">Now Playing {this.state.nowPlaying.title}</h1>
+                    <h1 className="center-align">Now Playing </h1>
                     <RadioPlayer room={this.props.params.roomID}  />
                   </Col>
                 </Row>
@@ -55,10 +80,18 @@ class Room extends Component {
             </Tab>
             <Tab label="Queue" value="q" style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
-                <h1>Queue</h1>
-                <p>
-                  This is where queue happens
-                </p>
+                <Row>
+                  <Col s={12}>
+                    <h1>Queue</h1>
+                  </Col>
+                  <Col s={12}>
+                    <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                      <List>
+                        {listcontent}
+                      </List>
+                    </MuiThemeProvider>
+                  </Col>
+                </Row>
               </div>
             </Tab>
             <Tab label="Search" value="s" style={{backgroundColor: '#424242', color: '#fff'}}>
