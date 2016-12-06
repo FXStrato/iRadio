@@ -8,6 +8,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {Link, hashHistory} from 'react-router';
 import Search from './Search';
+import Queue from './Queue';
 import RadioPlayer from './ReactPlayer';
 import _ from 'lodash';
 import {cyanA400, transparent} from 'material-ui/styles/colors';
@@ -26,6 +27,7 @@ class Room extends Component {
     dialogKey: null,
     dialogTitle: null
   }
+
 
   componentDidMount = () => {
     //Obtain information from the passed in roomID. Currently just pulling from nowPlaying, since that was hardcoded in
@@ -106,15 +108,18 @@ class Room extends Component {
                   <br/>
                   <Col s={12}>
                     <h1 className="center-align">Now Playing </h1>
-                    <RadioPlayer room={this.props.params.roomID}  />
+                  </Col>
+                  <Col s={12}>
+                    <RadioPlayer room={this.props.params.roomID} />
                   </Col>
                 </Row>
               </div>
             </Tab>
             <Tab label="Queue" value="q" style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
-                <Row>
-                  <Col s={12}>
+                <Queue room={this.props.params.roomID}/>
+                {/* <Row>
+                  <Col s={12} className="center-align">
                     <h1>Queue</h1>
                   </Col>
                   <Col s={12}>
@@ -124,7 +129,7 @@ class Room extends Component {
                       </List>
                     </MuiThemeProvider>
                   </Col>
-                </Row>
+                </Row> */}
               </div>
             </Tab>
             <Tab label="Search" value="s" style={{backgroundColor: '#424242', color: '#fff'}}>
