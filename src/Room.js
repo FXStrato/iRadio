@@ -21,11 +21,7 @@ class Room extends Component {
   state = {
     roomID: '',
     nowPlaying: {},
-    value: 'np',
-    open: false,
-    queue: [],
-    dialogKey: null,
-    dialogTitle: null
+    value: 'np'
   }
 
 
@@ -35,17 +31,6 @@ class Room extends Component {
     let roomRef = firebase.database().ref('channels/' + this.props.params.roomID).once('value').then(snapshot => {
       this.setState({nowPlaying: snapshot.val().nowPlaying});
     });
-    //set listener for queue
-    let queueRef = firebase.database().ref('channels/' + this.props.params.roomID + '/queue');
-    queueRef.on('value', snapshot => {
-      let temp = [];
-      snapshot.forEach(childsnap => {
-        let item = childsnap.val();
-        item.key = childsnap.key;
-        temp.push(item);
-      });
-      this.setState({queue: temp});
-    })
   }
 
   handleChange = value => {
@@ -58,46 +43,7 @@ class Room extends Component {
     }
   }
 
-  handleOpen = (key, title) => {
-    this.setState({dialogKey: key});
-    this.setState({dialogTitle: title});
-    this.setState({open: true});
-  }
-
-  handleClose = () => {
-    this.setState({open: false});
-  }
-
-  handleDelete = () => {
-    let songRef = firebase.database().ref('channels/' + this.props.params.roomID + '/queue/' + this.state.dialogKey);
-    songRef.remove();
-    songRef.off();
-    this.setState({open: false});
-  }
-
   render() {
-    //Populate queue
-    let listcontent = _.map(this.state.queue, (elem, index) => {
-      return <ListItem
-        style={{cursor: 'default'}}
-        key={elem.key}
-        primaryText={elem.title}
-        secondaryText={elem.channel}
-        rightIcon={<DeleteIcon style={{cursor: 'pointer'}} onTouchTap={() => this.handleOpen(elem.key, elem.title)} color={'#C2185B'} />}
-        leftAvatar={<Avatar color={cyanA400} backgroundColor={transparent}>{index + 1}</Avatar>}
-      />
-    });
-
-    const actions = [
-    <FlatButton
-        label="Cancel"
-        onTouchTap={this.handleClose}
-    />,
-    <FlatButton
-        label={'Remove Song From Queue'}
-        onTouchTap={this.handleDelete}
-    />]
-
     return (
       <div>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
@@ -107,7 +53,7 @@ class Room extends Component {
                 <Row>
                   <br/>
                   <Col s={12}>
-                    <h1 className="center-align">Now Playing </h1>
+                    <h1 className="center-align flow-text">Now Playing </h1>
                   </Col>
                   <Col s={12}>
                     <RadioPlayer room={this.props.params.roomID} />
@@ -117,26 +63,19 @@ class Room extends Component {
             </Tab>
             <Tab label="Queue" value="q" style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
-                <Queue room={this.props.params.roomID}/>
-                {/* <Row>
-                  <Col s={12} className="center-align">
-                    <h1>Queue</h1>
-                  </Col>
+                <Row>
                   <Col s={12}>
-                    <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                      <List>
-                        {listcontent}
-                      </List>
-                    </MuiThemeProvider>
+                    <h1 className="flow-text center-align">Queue</h1>
                   </Col>
-                </Row> */}
+                </Row>
+                <Queue room={this.props.params.roomID}/>
               </div>
             </Tab>
             <Tab label="Search" value="s" style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
                 <Row>
                   <Col s={12}>
-                    <h1 className="center-align">Search</h1>
+                    <h1 className="center-align flow-text">Search</h1>
                     <Search
                       apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
                       callback={this.searchCallback}
@@ -147,7 +86,7 @@ class Room extends Component {
             </Tab>
             <Tab label="History" value="h" style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
-                <h1>History</h1>
+                <h1 className="flow-text center-align">History</h1>
                 <p>
                   This is where history will go
                 </p>
@@ -155,15 +94,6 @@ class Room extends Component {
             </Tab>
           </Tabs>
         </MuiThemeProvider>
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-           <Dialog
-           title={'Deleting Song From Queue'.toUpperCase()}
-           actions={actions}
-           modal={false}
-           open={this.state.open}>
-           Are you sure you wish to remove {this.state.dialogTitle} from the queue?
-           </Dialog>
-         </MuiThemeProvider>
       </div>
     );
   }

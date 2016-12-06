@@ -83,7 +83,7 @@ class RadioPlayer extends React.Component {
         title: newTrack.title
       };
 
-    var nowPlayingRef = firebase.database().ref(refPath );
+    var nowPlayingRef = firebase.database().ref(refPath);
     nowPlayingRef.child("nowPlaying").set(newNowPlaying);
   };
 
@@ -297,48 +297,6 @@ class PlaybackControls extends React.Component {
 
   //renders the playback controls
   render() {
-
-    const iconStyle = {
-      color: "#00B4D2",
-      backgroundColor: "#303030"
-    };
-
-    const iconClasses =
-      {
-        backward: {
-          name: "backward",
-          className: "fa fa-step-backward playback-click",
-          callback: this.props.backwardCallback
-        },
-        play : {
-          name: "play",
-          className: "fa fa-play playback-click",
-          callback: this.props.playPauseCallback
-        },
-        forward : {
-          name: "forward",
-          className: "fa fa-step-forward playback-click",
-          callback: this.props.forwardCallback
-        }
-        // loop : {
-        //   name: "loop",
-        //   className: "fa fa-repeat playback-click",
-        //   callback: this.props.loopCallback
-        // }
-      };
-
-    var iconButtons = [];
-
-    for(var iconClass in iconClasses) {
-      var iconButton =
-        <IconButton
-          key={iconClasses[iconClass].name}
-          onClick={ iconClasses[iconClass].callback }
-          iconClassName={iconClasses[iconClass].className}
-          style={iconStyle}
-        />;
-        iconButtons.push(iconButton);
-    }
     return (
       <div className="row">
         <div className="col s8 offset-s2">
