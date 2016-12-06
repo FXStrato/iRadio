@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {AppBar, FlatButton, Tabs, Tab, RaisedButton, List, ListItem, Avatar} from 'material-ui';
+import {AppBar, FlatButton, Tabs, Tab, RaisedButton, List, ListItem, Avatar, Dialog} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -11,6 +11,7 @@ import Search from './Search';
 import RadioPlayer from './ReactPlayer';
 import _ from 'lodash';
 import {cyanA400, transparent} from 'material-ui/styles/colors';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 
 
@@ -20,7 +21,10 @@ class Room extends Component {
     roomID: '',
     nowPlaying: {},
     value: 'np',
-    queue: []
+    open: false,
+    queue: [],
+    dialogKey: null,
+    dialogTitle: null
   }
 
   componentDidMount = () => {
@@ -52,6 +56,23 @@ class Room extends Component {
     }
   }
 
+  handleOpen = (key, title) => {
+    this.setState({dialogKey: key});
+    this.setState({dialogTitle: title});
+    this.setState({open: true});
+  }
+
+  handleClose = () => {
+    this.setState({open: false});
+  }
+
+  handleDelete = () => {
+    let songRef = firebase.database().ref('channels/' + this.props.params.roomID + '/queue/' + this.state.dialogKey);
+    songRef.remove();
+    songRef.off();
+    this.setState({open: false});
+  }
+
   render() {
     //Populate queue
     let listcontent = _.map(this.state.queue, (elem, index) => {
@@ -60,11 +81,23 @@ class Room extends Component {
         key={elem.key}
         primaryText={elem.title}
         secondaryText={elem.channel}
+        rightIcon={<DeleteIcon style={{cursor: 'pointer'}} onTouchTap={() => this.handleOpen(elem.key, elem.title)} color={'#C2185B'} />}
         leftAvatar={<Avatar color={cyanA400} backgroundColor={transparent}>{index + 1}</Avatar>}
       />
     });
 
+    const actions = [
+    <FlatButton
+        label="Cancel"
+        onTouchTap={this.handleClose}
+    />,
+    <FlatButton
+        label={'Remove Song From Queue'}
+        onTouchTap={this.handleDelete}
+    />]
+
     return (
+      <div>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
           <Tabs value={this.state.value} onChange={this.handleChange}>
             <Tab label="Now Playing" value="np" style={{backgroundColor: '#424242', color: '#fff'}}>
@@ -117,6 +150,16 @@ class Room extends Component {
             </Tab>
           </Tabs>
         </MuiThemeProvider>
+        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+           <Dialog
+           title={'Deleting Song From Queue'.toUpperCase()}
+           actions={actions}
+           modal={false}
+           open={this.state.open}>
+           Are you sure you wish to remove {this.state.dialogTitle} from the queue?
+           </Dialog>
+         </MuiThemeProvider>
+      </div>
     );
   }
 }
