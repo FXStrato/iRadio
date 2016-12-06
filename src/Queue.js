@@ -55,15 +55,6 @@ class Queue extends React.Component {
   handleDelete = () => {
     let songRef = firebase.database().ref('channels/' + this.props.room + '/queue/' + this.state.dialogKey);
     songRef.remove();
-    // firebase.database().ref('channels/' + this.props.room + '/queue').once("value", (snapshot) => {
-    //   let temp = [];
-    //   snapshot.forEach(childsnap => {
-    //     let item = childsnap.val();
-    //     item.key = childsnap.key;
-    //     temp.push(item);
-    //   });
-    //   this.setState({queue: temp});
-    // });
     songRef.off();
     this.setState({open: false});
   }

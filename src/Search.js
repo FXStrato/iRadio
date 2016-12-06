@@ -156,7 +156,6 @@ class Search extends Component {
       thumbnail: song.thumbnail
     }
     roomRef.push(item);
-    roomRef.off();
     this.setState({open: false});
     this.setState({inputValue: ''});
     this.props.callback(true);

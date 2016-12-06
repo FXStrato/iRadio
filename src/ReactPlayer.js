@@ -269,7 +269,7 @@ class VideoContainer extends React.Component {
     return (
       <ReactPlayer
         style={{pointerEvents: 'none'}}
-        className="responsive-video"
+        className="responsive-video, z-depth-1"
         width={'100%'}
         playing={this.props.nowPlaying.isPlaying}
         url={this.props.url}
