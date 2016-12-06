@@ -94,7 +94,7 @@ class Search extends Component {
     });
   }
 
-  //Upon obtaining list of promises, return the youtube search results and promises for each result containing duration
+  //Upon obtaining list of promises, calculate the durations for each song
   getDurations = items => {
     this.setState({durations: []});
     //This currently only gives me promises
@@ -149,13 +149,13 @@ class Search extends Component {
     let roomRef = firebase.database().ref('channels/' + this.props.room + '/queue');
     let item = {
       duration: this.convertToSeconds(song.duration),
+      formatduration: song.duration,
       title: song.title,
       url: song.url,
       channel: song.channel,
       thumbnail: song.thumbnail
     }
     roomRef.push(item);
-    roomRef.off();
     this.setState({open: false});
     this.setState({inputValue: ''});
     this.props.callback(true);

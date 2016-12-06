@@ -2,7 +2,7 @@
 import React from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {AppBar, FlatButton, Tabs, Tab, RaisedButton, Dialog, TextField} from 'material-ui';
+import {AppBar, FlatButton, Tabs, Tab, RaisedButton, Dialog, TextField, Avatar} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -10,8 +10,6 @@ import {Link, hashHistory} from 'react-router';
 import SignInForm from './SignIn.js';
 import SignUpForm from './SignUp.js'
 
-
-//TODO: In join room, check to make sure they aren't joining a nonexisting room
 
 class LandingPage extends React.Component {
   state = {
@@ -22,7 +20,8 @@ class LandingPage extends React.Component {
     errorText: '',
     userEmail: 'init',
     userID: 'init',
-    roomMade: null
+    userHandle: '',
+    roomMade: null,
   }
 
   componentDidMount() {
@@ -32,14 +31,18 @@ class LandingPage extends React.Component {
       this.setState({userID:user.uid});
       this.setState({userEmail:user.email})
       //Check to see if they have made a room already
-      firebase.database().ref('channels/jeff').once('value').then(snapshot => {
+      firebase.database().ref('users/' + user.uid).once('value').then(snapshot=> {
         if(snapshot.val()) {
-          this.setState({roomMade: true})
-        } else {
-          this.setState({roomMade: false})
+          this.setState({userHandle: snapshot.val().handle})
+          firebase.database().ref('channels/' + snapshot.val().handle).once('value').then(snapshot => {
+            if(snapshot.val()) {
+              this.setState({roomMade: true})
+            } else {
+              this.setState({roomMade: false})
+            }
+          });
         }
       });
-
     }
     else{
       this.setState({userID: null}); //null out the saved state
@@ -87,25 +90,20 @@ componentWillUnmount() {
   }
 
   handleAction = () => {
-    //if creating, init room. Dummy data is inserted for now. Else, join the given room
+    //if creating, init room. Acquire user handle
     if(this.state.createDialog) {
-      let roomRef = firebase.database().ref('channels/jeff');
+      let roomRef = firebase.database().ref('channels/' + this.state.userHandle);
       roomRef.set({
         listeners: {},
-        nowPlaying: {
-          title: 'Shelter',
-          channel: 'Porter Robinson',
-          url: 'https://www.youtube.com/watch?v=fzQ6gRAEoy0',
-          thumbnail: 'https://i.ytimg.com/vi/fzQ6gRAEoy0/hqdefault.jpg?custom=true&w=246&h=138&stc=true&jpg444=true&jpgq=90&sp=68&sigh=RXcJaXW829FSP-JrIe8E6MTKHa4'
-        },
+        nowPlaying: {},
         queue: {},
         history: {},
-        owner: 'jeff'
+        owner: this.state.userHandle
       })
       roomRef.off();
       this.auth();
       this.handleClose();
-      hashHistory.push('room/jeff');
+      hashHistory.push('room/' + this.state.userHandle);
     } else {
       //Need to run a check if room exists here.
       let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
@@ -171,7 +169,11 @@ componentWillUnmount() {
         {content}
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
            <Dialog
+<<<<<<< HEAD
            title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join a Room'.toUpperCase()}
+=======
+           title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join A Room'.toUpperCase()}
+>>>>>>> 1c9d2c8619c255847f99a2b3ee6c7731f066a657
            actions={actions}
            modal={false}
            open={this.state.open}>

@@ -1,8 +1,12 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
-import {IconButton, Slider} from 'material-ui';
+import {IconButton, Slider, BottomNavigation, BottomNavigationItem} from 'material-ui';
 import 'font-awesome/css/font-awesome.css';
 import firebase from 'firebase';
+import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
+import PauseIcon from 'material-ui/svg-icons/av/pause';
+import BackIcon from 'material-ui/svg-icons/av/fast-rewind';
+import ForwardIcon from 'material-ui/svg-icons/av/fast-forward';
 
 //RadioPlayer componenet that has both the video container and the playback controls
 class RadioPlayer extends React.Component {
@@ -79,7 +83,7 @@ class RadioPlayer extends React.Component {
         title: newTrack.title
       };
 
-    var nowPlayingRef = firebase.database().ref(refPath );
+    var nowPlayingRef = firebase.database().ref(refPath);
     nowPlayingRef.child("nowPlaying").set(newNowPlaying);
   };
 
@@ -197,21 +201,31 @@ class RadioPlayer extends React.Component {
     }
     return (
       <div>
-        <VideoContainer
-          onProgress={this.onProgress}
-          onVideoEnd={this.onVideoEnd}
-          url={urlToInput}
-          nowPlaying={this.state.nowPlaying}
-          volume={this.state.volume}
-        />
-        <h1>{this.state.nowPlaying.title}</h1>
-        <span>{this.state.nowPlaying.duration}</span>
-        <PlaybackControls
-          playPauseCallback={this.handlePlayPauseClick}
-          forwardCallback={this.handleForwardClick}
-          backwardCallback={this.handleBackwardClick}
-          volumeCallback={this.handleVolumeChange}
-        />
+        <div className="row">
+          <div className="col l8 offset-l2 offset-m1 m10 s12">
+            <VideoContainer
+              onProgress={this.onProgress}
+              onVideoEnd={this.onVideoEnd}
+              url={urlToInput}
+              nowPlaying={this.state.nowPlaying}
+              volume={this.state.volume}
+            />
+          </div>
+          <div className="col s12 center-align">
+            <h1 className="flow-text">{this.state.nowPlaying.title}</h1>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col s12">
+            <PlaybackControls
+              isPlaying={this.state.nowPlaying.isPlaying}
+              playPauseCallback={this.handlePlayPauseClick}
+              forwardCallback={this.handleForwardClick}
+              backwardCallback={this.handleBackwardClick}
+              volumeCallback={this.handleVolumeChange}
+            />
+          </div>
+        </div>
       </div>
     )
   }
@@ -254,6 +268,9 @@ class VideoContainer extends React.Component {
   render() {
     return (
       <ReactPlayer
+        style={{pointerEvents: 'none'}}
+        className="responsive-video, z-depth-1"
+        width={'100%'}
         playing={this.props.nowPlaying.isPlaying}
         url={this.props.url}
         onProgress={this.props.onProgress}
@@ -274,57 +291,41 @@ class PlaybackControls extends React.Component {
     super(props);
   }
 
+  select = index => {
+
+  }
+
   //renders the playback controls
   render() {
-
-    const iconStyle = {
-      color: "#00B4D2",
-      backgroundColor: "#303030"
-    };
-
-    const iconClasses =
-      {
-        backward: {
-          name: "backward",
-          className: "fa fa-step-backward playback-click",
-          callback: this.props.backwardCallback
-        },
-        play : {
-          name: "play",
-          className: "fa fa-play playback-click",
-          callback: this.props.playPauseCallback
-        },
-        forward : {
-          name: "forward",
-          className: "fa fa-step-forward playback-click",
-          callback: this.props.forwardCallback
-        }
-        // loop : {
-        //   name: "loop",
-        //   className: "fa fa-repeat playback-click",
-        //   callback: this.props.loopCallback
-        // }
-      };
-
-    var iconButtons = [];
-
-    for(var iconClass in iconClasses) {
-      var iconButton =
-        <IconButton
-          key={iconClasses[iconClass].name}
-          onClick={ iconClasses[iconClass].callback }
-          iconClassName={iconClasses[iconClass].className}
-          style={iconStyle}
-        />;
-        iconButtons.push(iconButton);
-    }
     return (
-      <div>
-        {iconButtons}
-        <Slider
-          defaultValue={0.75}
-          onChange={this.props.volumeCallback}
-        />
+      <div className="row">
+        <div className="col s8 offset-s2">
+          <BottomNavigation style={{backgroundColor: '#212121'}}>
+            <BottomNavigationItem
+              label="Previous"
+              icon={<BackIcon/>}
+              onTouchTap={this.props.backwardCallback}
+            />
+            <BottomNavigationItem
+              label={!this.props.isPlaying ? "Play" : "Pause"}
+              icon={!this.props.isPlaying ? <PlayIcon/> : <PauseIcon/>}
+              onTouchTap={this.props.playPauseCallback}
+            />
+            <BottomNavigationItem
+              label="Forward"
+              icon={<ForwardIcon/>}
+              onTouchTap={this.props.forwardCallback}
+            />
+          </BottomNavigation>
+        </div>
+        <div className="col s2">
+          <Slider
+            defaultValue={0.75}
+            axis={'y'}
+            style={{height: '100px', marginTop: '-55px'}}
+            onChange={this.props.volumeCallback}
+          />
+        </div>
       </div>
     );
   }
