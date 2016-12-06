@@ -169,7 +169,7 @@ componentWillUnmount() {
         {content}
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
            <Dialog
-           title={'Create Your Room'.toUpperCase()}
+           title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join A Room'.toUpperCase()}
            actions={actions}
            modal={false}
            open={this.state.open}>

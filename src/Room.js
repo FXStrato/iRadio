@@ -2,15 +2,17 @@
 import React, {Component} from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {AppBar, FlatButton, Tabs, Tab, RaisedButton, List, ListItem, Avatar} from 'material-ui';
+import {AppBar, FlatButton, Tabs, Tab, RaisedButton, List, ListItem, Avatar, Dialog} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {Link, hashHistory} from 'react-router';
 import Search from './Search';
+import Queue from './Queue';
 import RadioPlayer from './ReactPlayer';
 import _ from 'lodash';
 import {cyanA400, transparent} from 'material-ui/styles/colors';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 
 
@@ -19,9 +21,9 @@ class Room extends Component {
   state = {
     roomID: '',
     nowPlaying: {},
-    value: 'np',
-    queue: []
+    value: 'np'
   }
+
 
   componentDidMount = () => {
     //Obtain information from the passed in roomID. Currently just pulling from nowPlaying, since that was hardcoded in
@@ -29,17 +31,6 @@ class Room extends Component {
     let roomRef = firebase.database().ref('channels/' + this.props.params.roomID).once('value').then(snapshot => {
       this.setState({nowPlaying: snapshot.val().nowPlaying});
     });
-    //set listener for queue
-    let queueRef = firebase.database().ref('channels/' + this.props.params.roomID + '/queue');
-    queueRef.on('value', snapshot => {
-      let temp = [];
-      snapshot.forEach(childsnap => {
-        let item = childsnap.val();
-        item.key = childsnap.key;
-        temp.push(item);
-      });
-      this.setState({queue: temp});
-    })
   }
 
   handleChange = value => {
@@ -53,18 +44,8 @@ class Room extends Component {
   }
 
   render() {
-    //Populate queue
-    let listcontent = _.map(this.state.queue, (elem, index) => {
-      return <ListItem
-        style={{cursor: 'default'}}
-        key={elem.key}
-        primaryText={elem.title}
-        secondaryText={elem.channel}
-        leftAvatar={<Avatar color={cyanA400} backgroundColor={transparent}>{index + 1}</Avatar>}
-      />
-    });
-
     return (
+      <div>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
           <Tabs value={this.state.value} onChange={this.handleChange}>
             <Tab label="Now Playing" value="np" style={{backgroundColor: '#424242', color: '#fff'}}>
@@ -72,8 +53,10 @@ class Room extends Component {
                 <Row>
                   <br/>
                   <Col s={12}>
-                    <h1 className="center-align">Now Playing </h1>
-                    <RadioPlayer room={this.props.params.roomID}  />
+                    <h1 className="center-align flow-text">Now Playing </h1>
+                  </Col>
+                  <Col s={12}>
+                    <RadioPlayer room={this.props.params.roomID} />
                   </Col>
                 </Row>
               </div>
@@ -82,23 +65,17 @@ class Room extends Component {
               <div className="container">
                 <Row>
                   <Col s={12}>
-                    <h1>Queue</h1>
-                  </Col>
-                  <Col s={12}>
-                    <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                      <List>
-                        {listcontent}
-                      </List>
-                    </MuiThemeProvider>
+                    <h1 className="flow-text center-align">Queue</h1>
                   </Col>
                 </Row>
+                <Queue room={this.props.params.roomID}/>
               </div>
             </Tab>
             <Tab label="Search" value="s" style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
                 <Row>
                   <Col s={12}>
-                    <h1 className="center-align">Search</h1>
+                    <h1 className="center-align flow-text">Search</h1>
                     <Search
                       apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
                       callback={this.searchCallback}
@@ -109,7 +86,7 @@ class Room extends Component {
             </Tab>
             <Tab label="History" value="h" style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
-                <h1>History</h1>
+                <h1 className="flow-text center-align">History</h1>
                 <p>
                   This is where history will go
                 </p>
@@ -117,6 +94,7 @@ class Room extends Component {
             </Tab>
           </Tabs>
         </MuiThemeProvider>
+      </div>
     );
   }
 }
