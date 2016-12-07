@@ -63,14 +63,14 @@ class SignUpForm extends React.Component {
         //var link = 'https://www.gravatar.com/avatar/' + md5(email);
         var profilePromise = firebaseUser.updateProfile({
           displayName: handle,
-          photoURL: 'https://www.gravatar.com/avatar/'
+          // photoURL: 'https://www.gravatar.com/avatar/'
         }); //return promise for chaining
 
         //create new entry in the Cloud DB (for others to reference)
 				var userRef = firebase.database().ref('users/'+firebaseUser.uid);
         var userData = {
           handle:handle,
-          avatar:'https://www.gravatar.com/avatar/'
+          // avatar:'https://www.gravatar.com/avatar/'
         }
         var userPromise = userRef.set(userData); //update entry in JOITC, return promise for chaining
         //return Promise.all(profilePromise, userPromise); //do both at once!
@@ -184,8 +184,8 @@ class SignUpForm extends React.Component {
     return (
       <div>
         <Row>
-          <Col s={12} m={6} l={6}>
-            <h1>Sign Up Here!</h1>
+          <Col s={12}>
+            <h1>Sign Up</h1>
             <form role="form">
               <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>

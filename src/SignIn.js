@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: "off"*/ //don't show warnings for unused
 import React from 'react';
-import {TextField, RaisedButton} from 'material-ui';
+import {TextField, RaisedButton, CircularProgress} from 'material-ui';
 //import {Link} from 'react-router';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
@@ -15,6 +15,9 @@ class SignInForm extends React.Component{
     this.state = {
       email: undefined,
       password: undefined,
+      errorText: '',
+      disabled: true,
+      icon: undefined
     };
     //function binding
     this.handleChange = this.handleChange.bind(this);
@@ -26,6 +29,8 @@ class SignInForm extends React.Component{
       var changes = {}; //object to hold changes
       changes[field] = value; //change this field
       this.setState(changes); //update state
+      this.setState({errorText: ''});
+      if(this.state.email && this.state.password) this.setState({disabled: false});
   }
 
   //handle signIn button
@@ -35,9 +40,15 @@ class SignInForm extends React.Component{
   }
 
   signInCallback(email, password) {
+    this.setState({disabled: true});
+    this.setState({icon: <CircularProgress size={26}/>});
     /* Sign in the user */
     firebase.auth().signInWithEmailAndPassword(email, password)
-      .catch((err) => alert(err.message));
+      .catch((err) => {
+        this.setState({disabled: false});
+        this.setState({icon: undefined});
+        this.setState({errorText: err.message});
+      });
   }
 
   render() {
@@ -45,22 +56,23 @@ class SignInForm extends React.Component{
     return (
       <div>
         <Row>
-          <Col s={12} m={6} l={6}>
-            <h1>Sign In Here!</h1>
-            <form role="form">
-              <div className="form-group">
+          <Col s={12}>
+            <h1>Sign In</h1>
+            <div style={{color: '#E53935'}}>{this.state.errorText}</div>
+            <form role="form" onSubmit={this.signIn}>
+              <div className="input-field">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
                   <TextField style={{color: '#039BE5'}} floatingLabelText="Email" fullWidth={true} type="email" name="email" onChange={(e) => {this.handleChange(e)}} />
                 </MuiThemeProvider>
               </div>
-              <div className="form-group">
+              <div className="input-field">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
                   <TextField style={{color: '#039BE5'}} floatingLabelText="Password" fullWidth={true} type="password" name="password" onChange={(e) => {this.handleChange(e)}}/>
                 </MuiThemeProvider>
               </div>
-              <div className="form-group">
+              <div className="input-field">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <RaisedButton label="Sign In" onTouchTap={this.signIn}/>
+                  <RaisedButton label={!this.state.icon && 'Sign In'} icon={this.state.icon} primary={true} disabled={this.state.disabled} labelStyle={{color: '#fff'}} onTouchTap={this.signIn}/>
                 </MuiThemeProvider>
               </div>
             </form>

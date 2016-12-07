@@ -17,10 +17,13 @@
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
     "react-materialize": "^0.17.6",
+    "react-motion": "^0.4.5",
     "react-player": "^0.12.1",
     "react-router": "^3.0.0",
+    "react-swipeable-views": "^0.8.1",
     "react-tap-event-plugin": "^2.0.1",
     "react-time": "^4.2.0",
+    "whatwg-fetch": "^2.0.1",
     "youtube-duration-format": "^0.2.0",
     "youtube-finder": "^1.0.0"
   },

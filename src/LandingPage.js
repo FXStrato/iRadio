@@ -86,36 +86,34 @@ componentWillUnmount() {
 
   handleJoinOwnRoom = () => {
     //Get user handle, and join the room
-    hashHistory.push('room/jeff');
+    hashHistory.push('room/' + this.state.userHandle);
+  }
+
+  handleCreateRoom = () => {
+    let roomRef = firebase.database().ref('channels/' + this.state.userHandle);
+    roomRef.set({
+      listeners: {},
+      nowPlaying: {},
+      queue: {},
+      history: {},
+      owner: this.state.userHandle
+    })
+    roomRef.off();
+    this.auth();
+    this.handleClose();
+    hashHistory.push('room/' + this.state.userHandle);
   }
 
   handleAction = () => {
-    //if creating, init room. Acquire user handle
-    if(this.state.createDialog) {
-      let roomRef = firebase.database().ref('channels/' + this.state.userHandle);
-      roomRef.set({
-        listeners: {},
-        nowPlaying: {},
-        queue: {},
-        history: {},
-        owner: this.state.userHandle
-      })
-      roomRef.off();
-      this.auth();
-      this.handleClose();
-      hashHistory.push('room/' + this.state.userHandle);
-    } else {
-      //Need to run a check if room exists here.
-      let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
-        if(snapshot.val()) {
-          //True, means the room exists
-          hashHistory.push('room/' + this.state.roomName);
-        } else {
-          this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
-        }
-      });
-    }
-
+    //Need to run a check if room exists here.
+    let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
+      if(snapshot.val()) {
+        //True, means the room exists
+        hashHistory.push('room/' + this.state.roomName);
+      } else {
+        this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
+      }
+    });
   }
 
   render() {
@@ -127,23 +125,31 @@ componentWillUnmount() {
     />,
     <FlatButton
         label={this.state.createDialog ? "Create Room" : "Join Room"}
-        onTouchTap={this.handleAction}
+        onTouchTap={this.state.createDialog ? this.handleCreateRoom : this.handleAction}
     />]
 
     let content = null;
     if(firebase.auth().currentUser) {
       content = <div>
+        <Row>
+          <Col s={12} className="center-align">
+            <h1>Let The Music Flow</h1>
+            <div className="flow-text">
+              Host your own room and share your music, or get the room ID of a friend and join them!
+            </div>
+          </Col>
+        </Row>
         <Row className="center-align">
           <br/>
           <Col s={12}>
             {this.state.roomMade === true && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Enter Created Room" onTouchTap={this.handleJoinOwnRoom}/>
+              <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Enter Your Room" onTouchTap={this.handleJoinOwnRoom}/>
             </MuiThemeProvider>}
             {this.state.roomMade === false && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
               <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Create Room" onTouchTap={() => {this.handleOpen(true)}}/>
             </MuiThemeProvider>}
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} secondary={true} label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+              <RaisedButton labelStyle={{color:'#fff'}} backgroundColor='#0DBAAD' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
             </MuiThemeProvider>
           </Col>
         </Row>
@@ -151,16 +157,26 @@ componentWillUnmount() {
     } else if(this.state.userID !== 'init') {
       content =  <div>
         <Row>
-          <Col s={12}>
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap}/>
-            </MuiThemeProvider>
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} secondary={true} label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
-            </MuiThemeProvider>
+          <br/>
+          <Col s={12} m={6} l={6}>
+            <h1>Welcome to iRadio!</h1>
+            <div className="flow-text">
+              Queue songs to play, add songs to a friend's room, or make your own room in iRadio!
+            </div>
+            <br/>
+            <div>
+              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <RaisedButton style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap} backgroundColor="#03A9F4"/>
+              </MuiThemeProvider>
+              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <RaisedButton labelStyle={{color:'#fff'}} style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} backgroundColor='#0DBAAD' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+              </MuiThemeProvider>
+            </div>
+          </Col>
+          <Col s={12} m={6} l={6}>
+            {this.state.signin ? <SignInForm/> : <SignUpForm/>}
           </Col>
         </Row>
-            {this.state.signin ? <SignInForm/> : <SignUpForm/>}
       </div>
     }
 
@@ -179,12 +195,16 @@ componentWillUnmount() {
            open={this.state.open}>
            {this.state.createDialog ? "Create a room to share music with friends!" : "Join a pre-existing friends room!"} <br/>
            {!this.state.createDialog && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField
-                floatingLabelText="Room ID"
-                id='joinroom-input'
-                onChange={this.handleChange}
-                errorText={this.state.errorText}
-              />
+              <form onSubmit={this.handleAction}>
+                <Col s={12} className="input-field">
+                  <TextField
+                    floatingLabelText="Room ID"
+                    id='joinroom-input'
+                    onChange={this.handleChange}
+                    errorText={this.state.errorText}
+                  />
+                </Col>
+              </form>
               </MuiThemeProvider>}
            </Dialog>
          </MuiThemeProvider>

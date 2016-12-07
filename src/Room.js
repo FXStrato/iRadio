@@ -2,35 +2,50 @@
 import React, {Component} from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {AppBar, FlatButton, Tabs, Tab, RaisedButton, List, ListItem, Avatar, Dialog} from 'material-ui';
+import {Tabs, Tab} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {Link, hashHistory} from 'react-router';
+import SwipeableViews from 'react-swipeable-views';
 import Search from './Search';
-import Queue from './Queue';
+import SongList from './SongList';
 import RadioPlayer from './ReactPlayer';
-import _ from 'lodash';
-import {cyanA400, transparent} from 'material-ui/styles/colors';
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
-
-
 
 //Room that will host all the functionality of our app. Need tabs for queue, history, and now playing
 class Room extends Component {
   state = {
     roomID: '',
-    nowPlaying: {},
-    value: 'np'
+    value: 0,
+    userID: null,
+    userEmail: null,
+    userHandle: '',
+    isOwner: false
   }
 
+  componentWillUnmount = () => {
+    this.auth();
+  }
 
   componentDidMount = () => {
-    //Obtain information from the passed in roomID. Currently just pulling from nowPlaying, since that was hardcoded in
     this.setState({roomID: this.props.params.roomID})
-    let roomRef = firebase.database().ref('channels/' + this.props.params.roomID).once('value').then(snapshot => {
-      this.setState({nowPlaying: snapshot.val().nowPlaying});
-    });
+    /* Add a listener and callback for authentication events */
+    this.auth = firebase.auth().onAuthStateChanged(user => {
+      if(user) {
+        this.setState({userID:user.uid});
+        this.setState({userEmail:user.email})
+        firebase.database().ref('users/' + user.uid).once('value').then(snapshot=> {
+          if(snapshot.val()) {
+            if(snapshot.val().handle === this.props.params.roomID) this.setState({isOwner: true});
+            this.setState({userHandle: snapshot.val().handle})
+          }
+        });
+      }
+      else{
+        this.setState({userID: null}); //null out the saved state
+        this.setState({userEmail: null})
+      }
+    })
   }
 
   handleChange = value => {
@@ -39,7 +54,7 @@ class Room extends Component {
 
   searchCallback = result => {
     if(result) {
-      this.setState({value: 'q'});
+      this.setState({value: 1});
     }
   }
 
@@ -47,52 +62,60 @@ class Room extends Component {
     return (
       <div>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-          <Tabs value={this.state.value} onChange={this.handleChange}>
-            <Tab label="Now Playing" value="np" style={{backgroundColor: '#424242', color: '#fff'}}>
-              <div className="container">
-                <Row>
-                  <br/>
-                  <Col s={12}>
-                    <h1 className="center-align flow-text">Now Playing </h1>
-                  </Col>
-                  <Col s={12}>
-                    <RadioPlayer room={this.props.params.roomID} />
-                  </Col>
-                </Row>
-              </div>
+          <Tabs value={this.state.value} onChange={this.handleChange} inkBarStyle={{backgroundColor: '#00E5FF'}}>
+            <Tab label="Now Playing" value={0} style={{backgroundColor: '#424242', color: '#fff'}}>
             </Tab>
-            <Tab label="Queue" value="q" style={{backgroundColor: '#424242', color: '#fff'}}>
-              <div className="container">
-                <Row>
-                  <Col s={12}>
-                    <h1 className="flow-text center-align">Queue</h1>
-                  </Col>
-                </Row>
-                <Queue room={this.props.params.roomID}/>
-              </div>
+            <Tab label="Queue" value={1} style={{backgroundColor: '#424242', color: '#fff'}}>
             </Tab>
-            <Tab label="Search" value="s" style={{backgroundColor: '#424242', color: '#fff'}}>
-              <div className="container">
-                <Row>
-                  <Col s={12}>
-                    <h1 className="center-align flow-text">Search</h1>
-                    <Search
-                      apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-                      callback={this.searchCallback}
-                      room={this.state.roomID} />
-                  </Col>
-                </Row>
-              </div>
+            <Tab label="Search" value={2} style={{backgroundColor: '#424242', color: '#fff'}}>
             </Tab>
-            <Tab label="History" value="h" style={{backgroundColor: '#424242', color: '#fff'}}>
-              <div className="container">
-                <h1 className="flow-text center-align">History</h1>
-                <p>
-                  This is where history will go
-                </p>
-              </div>
+            <Tab label="History" value={3} style={{backgroundColor: '#424242', color: '#fff'}}>
             </Tab>
           </Tabs>
+        </MuiThemeProvider>
+        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+          <SwipeableViews
+            index={this.state.value}
+            onChangeIndex={this.handleChange}>
+            <div className="container">
+              <Row>
+                <br/>
+                <Col s={12}>
+                  <h1 className="center-align flow-text">Now Playing</h1>
+                </Col>
+                <Col s={12}>
+                  <RadioPlayer room={this.props.params.roomID} isOwner={this.state.isOwner} />
+                </Col>
+              </Row>
+            </div>
+            <div className="container">
+              <Row>
+                <Col s={12}>
+                  <h1 className="flow-text center-align">Next Songs</h1>
+                </Col>
+              </Row>
+              <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="queue"/>
+            </div>
+            <div className="container">
+              <Row>
+                <Col s={12}>
+                  <h1 className="center-align flow-text">Search</h1>
+                  <Search
+                    apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
+                    callback={this.searchCallback}
+                    room={this.state.roomID} />
+                </Col>
+              </Row>
+            </div>
+            <div className="container">
+              <Row>
+                <Col s={12}>
+                  <h1 className="flow-text center-align">History</h1>
+                    <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="history"/>
+                </Col>
+              </Row>
+            </div>
+          </SwipeableViews>
         </MuiThemeProvider>
       </div>
     );
