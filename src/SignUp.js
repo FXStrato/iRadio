@@ -184,7 +184,7 @@ class SignUpForm extends React.Component {
     return (
       <div>
         <Row>
-          <Col s={12} m={6} l={6}>
+          <Col s={12}>
             <h1>Sign Up Here!</h1>
             <form role="form">
               <div className="form-group">

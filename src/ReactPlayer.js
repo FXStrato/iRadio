@@ -24,7 +24,6 @@ class RadioPlayer extends React.Component {
 
   componentDidMount() {
 
-
     // firebase.auth().signInWithEmailAndPassword("evan@test.com", "123123")
     //   .catch((err) => console.log(err));
     var channelId = this.props.room;

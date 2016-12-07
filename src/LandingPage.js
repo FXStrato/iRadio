@@ -86,7 +86,7 @@ componentWillUnmount() {
 
   handleJoinOwnRoom = () => {
     //Get user handle, and join the room
-    hashHistory.push('room/jeff');
+    hashHistory.push('room/' + this.state.userHandle);
   }
 
   handleAction = () => {
@@ -133,6 +133,14 @@ componentWillUnmount() {
     let content = null;
     if(firebase.auth().currentUser) {
       content = <div>
+        <Row>
+          <Col s={12} className="center-align">
+            <h1>Let The Music Flow</h1>
+            <div className="flow-text">
+              Host your own room and share your music, or find friends to join!
+            </div>
+          </Col>
+        </Row>
         <Row className="center-align">
           <br/>
           <Col s={12}>
@@ -143,7 +151,7 @@ componentWillUnmount() {
               <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Create Room" onTouchTap={() => {this.handleOpen(true)}}/>
             </MuiThemeProvider>}
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} secondary={true} label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+              <RaisedButton labelStyle={{color:'#fff'}} backgroundColor='#0DBAAD' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
             </MuiThemeProvider>
           </Col>
         </Row>
@@ -151,16 +159,26 @@ componentWillUnmount() {
     } else if(this.state.userID !== 'init') {
       content =  <div>
         <Row>
-          <Col s={12}>
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap}/>
-            </MuiThemeProvider>
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} secondary={true} label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
-            </MuiThemeProvider>
+          <br/>
+          <Col s={12} m={6} l={6}>
+            <h1>Welcome to iRadio!</h1>
+            <div className="flow-text">
+              Find a room to join, or sign up to queue songs in your own room!
+            </div>
+            <br/>
+            <div>
+              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <RaisedButton style={{marginRight: '10px'}} style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap} backgroundColor="#03A9F4"/>
+              </MuiThemeProvider>
+              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <RaisedButton labelStyle={{color:'#fff'}} style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} backgroundColor='#0DBAAD' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+              </MuiThemeProvider>
+            </div>
+          </Col>
+          <Col s={12} m={6} l={6}>
+            {this.state.signin ? <SignInForm/> : <SignUpForm/>}
           </Col>
         </Row>
-            {this.state.signin ? <SignInForm/> : <SignUpForm/>}
       </div>
     }
 
