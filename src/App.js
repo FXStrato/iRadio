@@ -74,10 +74,6 @@ class App extends Component {
         </header>
         <main>
           {this.props.children}
-          {/* <h1 className="center-align">Search</h1>
-          <Search
-            apiKey='AIzaSyAtSE-0lZOKunNlkHt8wDJk9w4GjFL9Fu4'
-            callback={this.searchCallback} /> */}
         </main>
         <footer>
 

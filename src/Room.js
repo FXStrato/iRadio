@@ -2,19 +2,13 @@
 import React, {Component} from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {AppBar, FlatButton, Tabs, Tab, RaisedButton, List, ListItem, Avatar, Dialog} from 'material-ui';
+import {Tabs, Tab} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-import {Link, hashHistory} from 'react-router';
 import Search from './Search';
-import Queue from './Queue';
+import SongList from './Queue';
 import RadioPlayer from './ReactPlayer';
-import _ from 'lodash';
-import {cyanA400, transparent} from 'material-ui/styles/colors';
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
-
-
 
 //Room that will host all the functionality of our app. Need tabs for queue, history, and now playing
 class Room extends Component {
@@ -68,7 +62,7 @@ class Room extends Component {
                     <h1 className="flow-text center-align">Queue</h1>
                   </Col>
                 </Row>
-                <Queue room={this.props.params.roomID}/>
+                <SongList room={this.props.params.roomID} listType="queue"/>
               </div>
             </Tab>
             <Tab label="Search" value="s" style={{backgroundColor: '#424242', color: '#fff'}}>
@@ -88,7 +82,7 @@ class Room extends Component {
               <div className="container">
                 <h1 className="flow-text center-align">History</h1>
                 <p>
-                  This is where history will go
+                  <SongList room={this.props.params.roomID} listType="history"/>
                 </p>
               </div>
             </Tab>

@@ -149,7 +149,7 @@ class Search extends Component {
     let roomRef = firebase.database().ref('channels/' + this.props.room + '/queue');
     let item = {
       duration: this.convertToSeconds(song.duration),
-      formatduration: song.duration,
+      formattedDuration: song.duration,
       title: song.title,
       url: song.url,
       channel: song.channel,

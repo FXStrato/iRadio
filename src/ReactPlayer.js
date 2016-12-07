@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
-import {IconButton, Slider, BottomNavigation, BottomNavigationItem} from 'material-ui';
+import {Slider, BottomNavigation, BottomNavigationItem} from 'material-ui';
 import 'font-awesome/css/font-awesome.css';
 import firebase from 'firebase';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import PauseIcon from 'material-ui/svg-icons/av/pause';
-import BackIcon from 'material-ui/svg-icons/av/fast-rewind';
 import ForwardIcon from 'material-ui/svg-icons/av/fast-forward';
 
 //RadioPlayer componenet that has both the video container and the playback controls
@@ -16,6 +15,15 @@ class RadioPlayer extends React.Component {
     this.state =
       {
         nowPlaying:{
+          url: '',
+          baseUrl: '',
+          duration: 0,
+          formattedDuration: '',
+          title: '',
+          thumbnail: '',
+          channel: '',
+          progress: 0,
+          isPlaying: false
         },
         queue:{},
         volume: 0.75
@@ -24,24 +32,32 @@ class RadioPlayer extends React.Component {
 
   componentDidMount() {
 
+    firebase.auth().onAuthStateChanged((user) =>  {
+      if(user) {
+        this.setState({user:user});
+      }
+    });
 
-    // firebase.auth().signInWithEmailAndPassword("evan@test.com", "123123")
-    //   .catch((err) => console.log(err));
     var channelId = this.props.room;
     let refPath = "channels/" + channelId;
 
     let channelRef = firebase.database().ref(refPath);
     channelRef.on("value", (snapshot) => {
       var channelObject = snapshot.val();
-      let queueInstance = channelObject.queue;
-      for(let track in queueInstance) {
-        if(queueInstance.hasOwnProperty(track)) {
-          queueInstance[track].key = track;
-        }
-      }
       var newState = this.state;
-      newState.queue = queueInstance;
+      let queueInstance = channelObject.queue;
+      if(queueInstance) {
+        for(let track in queueInstance) {
+          if(queueInstance.hasOwnProperty(track)) {
+            queueInstance[track].key = track;
+          }
+        }
+        newState.queue = queueInstance;
+      }
       let nowPlayingInstance = channelObject.nowPlaying;
+
+
+
       newState.nowPlaying = nowPlayingInstance;
       this.setState(newState);
     })
@@ -60,37 +76,63 @@ class RadioPlayer extends React.Component {
   handleForwardClick = () => {
     var refPath = "channels/" + this.props.room;
     var queueRef = firebase.database().ref(refPath + "/queue");
-    var newTrack = {};
+    var historyRef = firebase.database().ref("channels/" + this.props.room + "/history");
+    var nowPlayingRef = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
+
+    var roomRef = firebase.database().ref(refPath);
+    //save the old now playing object
+    var oldTrack = {
+      url: this.state.nowPlaying.url,
+      baseUrl: this.state.nowPlaying.url,
+      duration: this.state.nowPlaying.duration,
+      formattedDuration: this.state.nowPlaying.formattedDuration,
+      title: this.state.nowPlaying.title,
+      thumbnail: this.state.nowPlaying.thumbnail,
+      channel: this.state.nowPlaying.channel,
+    };
+    historyRef.push(oldTrack);
+
+    //get the object at the front of the queue
+    var newTrack = null;
     queueRef.orderByKey().limitToFirst(1)
       .once("value", (snapshot) => {
         var newTrackContainer = snapshot.val();
-        for (var track in newTrackContainer) {
-          if(newTrackContainer.hasOwnProperty(track)) {
-            newTrack = newTrackContainer[track];
-            newTrack.key = track;
+        if(newTrackContainer) {
+          for (var track in newTrackContainer) {
+            if (newTrackContainer.hasOwnProperty(track)) {
+              newTrack = newTrackContainer[track];
+              newTrack.key = track;
+            }
           }
         }
       });
 
-    //removes the child
-    firebase.database().ref(refPath + "/queue/" + newTrack.key).remove();
+    if(newTrack) {
+      firebase.database().ref(refPath + "/queue/" + newTrack.key).remove();
+    }
+    //removes the song that was at the front of the queue
     var newQueue = {};
     queueRef.once("value", (snapshot) => {
       newQueue = snapshot.val();
     });
-
-    var newNowPlaying = {
+    //update the new now playing object entry
+    var newNowPlaying = null;
+    if(newTrack) {
+      newNowPlaying = {
         url: newTrack.url,
-        baseUrl: newTrack.url,
+          baseUrl: newTrack.url,
         duration: newTrack.duration,
+        formattedDuration: newTrack.formattedDuration,
+        title: newTrack.title,
+        thumbnail: newTrack.thumbnail,
+        channel: newTrack.channel,
         progress: 0,
-        isPlaying: true,
-        title: newTrack.title
-      };
-
-    var nowPlayingRef = firebase.database().ref(refPath);
-    nowPlayingRef.child("nowPlaying").set(newNowPlaying);
-    nowPlayingRef.child("queue").set(newQueue);
+        isPlaying: true
+      }
+    }
+    nowPlayingRef.set(newNowPlaying);
+    roomRef.child("queue").set(newQueue);
+    this.setState({nowPlaying:null});
   };
 
   //for now, resets the queue
@@ -192,25 +234,30 @@ class RadioPlayer extends React.Component {
 
   //renders the entire video player
   render() {
-    var updated = JSON.parse(localStorage.getItem("updated"));
-    var urlToInput = this.state.nowPlaying.baseUrl;
-    var tempUrl = JSON.parse(localStorage.getItem("tempUrl"));
-    if(!updated && this.state.nowPlaying.progress) {
-      if((tempUrl === null || tempUrl === undefined) ) {
-        var timeOfCurrentVideo = this.state.nowPlaying.progress * this.state.nowPlaying.duration;
-        tempUrl = this.state.nowPlaying.baseUrl + this.convertToYoutubeTimestamp(timeOfCurrentVideo);
-        localStorage.setItem("tempUrl",JSON.stringify(tempUrl));
+
+    var content = <div>There are currently no songs queued up!</div>;
+    if(this.state.nowPlaying) {
+
+      var updated = JSON.parse(localStorage.getItem("updated"));
+      var urlToInput = this.state.nowPlaying.baseUrl;
+      var tempUrl = JSON.parse(localStorage.getItem("tempUrl"));
+      if(!updated && this.state.nowPlaying.progress) {
+        if((tempUrl === null || tempUrl === undefined) ) {
+          var timeOfCurrentVideo = this.state.nowPlaying.progress * this.state.nowPlaying.duration;
+          tempUrl = this.state.nowPlaying.baseUrl + this.convertToYoutubeTimestamp(timeOfCurrentVideo);
+          localStorage.setItem("tempUrl",JSON.stringify(tempUrl));
+        }
+        urlToInput = tempUrl;
+        localStorage.setItem("updated", JSON.stringify(true));
+      } else if(tempUrl && tempUrl.startsWith(this.state.nowPlaying.baseUrl)) {
+        urlToInput = tempUrl;
+      } else {
+        localStorage.removeItem("tempUrl");
       }
-      urlToInput = tempUrl;
-      localStorage.setItem("updated", JSON.stringify(true));
-    } else if(tempUrl && tempUrl.startsWith(this.state.nowPlaying.baseUrl)) {
-      urlToInput = tempUrl;
-    } else {
-      localStorage.removeItem("tempUrl");
-    }
-    return (
-      <div>
+
+      content = <div>
         <div className="row">
+
           <div className="col l8 offset-l2 offset-m1 m10 s12">
             <VideoContainer
               onProgress={this.onProgress}
@@ -236,22 +283,19 @@ class RadioPlayer extends React.Component {
           </div>
         </div>
       </div>
-    )
+    }
+
+    return (content);
   }
 }
 
 //Video container that has the playing youtube video for the room
 class VideoContainer extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      timeElapsedQuery: ""
-    }
-  }
-
   //renders the video container
   render() {
+
+
     return (
       <ReactPlayer
         style={{pointerEvents: 'none'}}
@@ -266,17 +310,12 @@ class VideoContainer extends React.Component {
         played={this.props.nowPlaying.progress}
         volume={this.props.volume}
         controls={false}
-      />
-    );
+      />);
   }
 }
 
 //Playback controls for the Radio Player
 class PlaybackControls extends React.Component {
-
-  constructor(props) {
-    super(props);
-  }
 
   select = index => {
 
@@ -288,11 +327,6 @@ class PlaybackControls extends React.Component {
       <div className="row">
         <div className="col s8 offset-s2">
           <BottomNavigation style={{backgroundColor: '#212121'}}>
-            <BottomNavigationItem
-              label="Previous"
-              icon={<BackIcon/>}
-              onTouchTap={this.props.backwardCallback}
-            />
             <BottomNavigationItem
               label={!this.props.isPlaying ? "Play" : "Pause"}
               icon={!this.props.isPlaying ? <PlayIcon/> : <PauseIcon/>}

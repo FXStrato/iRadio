@@ -5,10 +5,9 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {List, ListItem, Dialog, FlatButton} from 'material-ui';
 import firebase from 'firebase';
-import {cyanA400, transparent} from 'material-ui/styles/colors';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-class Queue extends React.Component {
+class SongList extends React.Component {
   state = {
     queue: [],
     dialogKey: null,
@@ -22,7 +21,7 @@ class Queue extends React.Component {
 
   componentDidMount = () => {
     //this listener might not actually be working totally upon tab switch. Need to check this
-    this.queueRef = firebase.database().ref('channels/' + this.props.room + '/queue');
+    this.queueRef = firebase.database().ref('channels/' + this.props.room + '/' + this.props.listType);
     this.queueRef.on('value', snapshot => {
       let temp = [];
       snapshot.forEach(childsnap => {
@@ -34,10 +33,8 @@ class Queue extends React.Component {
     })
     //Temporary, trying to locate bug
     this.queueRef.on('child_added', snapshot => {
-      console.log('child element was added');
     })
     this.queueRef.on('child_removed', snapshot => {
-      console.log('child element was removed');
     })
   }
 
@@ -53,7 +50,7 @@ class Queue extends React.Component {
 
   //This function might be causing problems. Not sure though. It still deletes, but queue isn't updating.
   handleDelete = () => {
-    let songRef = firebase.database().ref('channels/' + this.props.room + '/queue/' + this.state.dialogKey);
+    let songRef = firebase.database().ref('channels/' + this.props.room + '/' + this.props.listType + '/' + this.state.dialogKey);
     songRef.remove();
     songRef.off();
     this.setState({open: false});
@@ -61,16 +58,30 @@ class Queue extends React.Component {
 
   render() {
     let songList = _.map(this.state.queue, (song, index) => {
-      return (
-          <ListItem
-            style={{overflow: 'hidden'}}
-            innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
-            key={song.key}
-            leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
-            rightIcon={<DeleteIcon style={{cursor: 'pointer'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />}
-            primaryText={<div style={{paddingTop: '20px', paddingRight: '50px', color:'white'}}>{song.title}</div>}
-            secondaryText={<div style={{color:'white'}}>{song.channel} | {song.formatduration}</div>}
-          />);
+
+      var content = '';
+      if(this.props.listType === 'queue') {
+        content = <ListItem
+          style={{overflow: 'hidden'}}
+          innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
+          key={song.key}
+          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
+          rightIcon={<DeleteIcon style={{cursor: 'pointer'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />}
+          primaryText={<div style={{paddingTop: '20px', paddingRight: '50px', color:'white'}}>{song.title}</div>}
+          secondaryText={<div style={{color:'white'}}>{song.channel} | {song.formatduration}</div>}
+        />;
+      } else {
+        content = <ListItem
+          style={{overflow: 'hidden'}}
+          innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
+          key={song.key}
+          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
+          primaryText={<div style={{paddingTop: '20px', paddingRight: '50px', color:'white'}}>{song.title}</div>}
+          secondaryText={<div style={{color:'white'}}>{song.channel} | {song.formatduration}</div>}
+        />;
+      }
+
+      return content;
     });
 
     const actions = [
@@ -108,4 +119,4 @@ class Queue extends React.Component {
   }
 }
 
-export default Queue;
+export default SongList;
