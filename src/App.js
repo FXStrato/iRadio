@@ -10,6 +10,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import firebase from 'firebase';
 import {Link, hashHistory} from 'react-router';
+import mainIcon from './img/mainIcon.png';
 
 import LandingPage from './LandingPage';
 
@@ -61,13 +62,18 @@ class App extends Component {
 
   render() {
 
+    //Can add a join button if in a room
+    if(hashHistory.getCurrentLocation().pathname.indexOf('room') !== -1) {
+
+    }
+
     return (
       <div>
         <header>
           <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
             <AppBar
-              style={{backgroundColor: '#262626'}}
-              title={<span style={{cursor: 'pointer'}} onClick={this.goHome}>iRadio</span>}
+              style={{backgroundColor: '#262626',}}
+              title={<div style={{cursor: 'pointer'}} onClick={this.goHome}> <img style={{float: 'left', width: '50px', height: '50px', marginTop: '10px'}} src={mainIcon} alt="Network by Dmitry Mirolyubov from the Noun Project"/><span>iRadio</span></div>}
               titleStyle={{color: '#fff !important'}}
               iconElementRight={<FlatButton style={{color: '#fff !important'}} label={this.state.userEmail ? this.state.userEmail + " | Sign Out" : "Not logged In"} onTouchTap={this.state.userID ? this.signOut : this.goHome} />}
               showMenuIconButton={false}

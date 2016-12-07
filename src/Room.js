@@ -82,7 +82,7 @@ class Room extends Component {
                     <h1 className="flow-text center-align">Queue</h1>
                   </Col>
                 </Row>
-                <Queue room={this.props.params.roomID}/>
+                <Queue room={this.props.params.roomID} user={this.state.userID}/>
               </div>
             </Tab>
             <Tab label="Search" value="s" style={{backgroundColor: '#424242', color: '#fff'}}>

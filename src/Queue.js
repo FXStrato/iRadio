@@ -60,7 +60,7 @@ class Queue extends React.Component {
             innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
             key={song.key}
             leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginLeft: '10px', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
-            rightIcon={<DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />}
+            rightIcon={this.props.user && <DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />}
             primaryText={<div style={{paddingTop: '20px', paddingRight: '50px', color:'white'}}>{song.title}</div>}
             secondaryText={<div style={{color:'white'}}>{song.channel} | {song.formatduration}</div>}
           />);
