@@ -20,39 +20,40 @@ class RadioPlayer extends React.Component {
       };
   }
 
+  componentWillUnmount() {
+    this.auth();
+    this.queueRef.off();
+    this.nowPlayingRef.off();
+    localStorage.removeItem('tempUrl');
+    localStorage.setItem('updated', JSON.stringify(false));
+  }
+
   componentDidMount() {
 
-    firebase.auth().onAuthStateChanged((user) =>  {
+    this.auth = firebase.auth().onAuthStateChanged((user) =>  {
       if(user) {
         this.setState({user:user});
       }
     });
 
-    var queueRef = firebase.database().ref("channels/" + this.props.room + "/queue");
-    var nowPlayingRef = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
-    nowPlayingRef.on('value', (snapshot) => {
+    this.queueRef = firebase.database().ref("channels/" + this.props.room + "/queue");
+    this.nowPlayingRef = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
+    this.nowPlayingRef.on('value', (snapshot) => {
       var newNowPlaying = snapshot.val();
       this.setState({nowPlaying:newNowPlaying});
     });
-    queueRef.on('child_added', (snapshot) => {
+    this.queueRef.on('child_added', (snapshot) => {
       var trackInstance = snapshot.val();
       if(!this.state.nowPlaying) {
         var item = trackInstance;
         item.progress = 0;
         item.isPlaying = true;
         item.baseUrl = trackInstance.url;
-        nowPlayingRef.set(item);
+        this.nowPlayingRef.set(item);
         this.setState({nowPlaying:item});
-        queueRef.child(snapshot.key).remove();
+        this.queueRef.child(snapshot.key).remove();
       }
     });
-  }
-
-  componentWillUnmount() {
-    firebase.database().ref('users').off();
-    firebase.database().ref('channels').off();
-    localStorage.removeItem('tempUrl');
-    localStorage.setItem('updated', JSON.stringify(false));
   }
 
   //handles the playing and pausing of the video for the whole room. only admin should have control over thi

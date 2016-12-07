@@ -91,7 +91,7 @@ class Room extends Component {
             <div className="container">
               <Row>
                 <Col s={12}>
-                  <h1 className="flow-text center-align">Queue</h1>
+                  <h1 className="flow-text center-align">Next Songs</h1>
                 </Col>
               </Row>
               <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="queue"/>
