@@ -29,7 +29,9 @@ class Room extends Component {
     //Obtain information from the passed in roomID. Currently just pulling from nowPlaying, since that was hardcoded in
     this.setState({roomID: this.props.params.roomID})
     let roomRef = firebase.database().ref('channels/' + this.props.params.roomID).once('value').then(snapshot => {
-      this.setState({nowPlaying: snapshot.val().nowPlaying});
+      if(snapshot.val()) {
+          this.setState({nowPlaying: snapshot.val().nowPlaying});
+      }
     });
   }
 
