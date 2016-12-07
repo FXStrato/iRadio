@@ -66,8 +66,10 @@ class App extends Component {
         <header>
           <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
             <AppBar
+              style={{backgroundColor: '#262626'}}
               title={<span style={{cursor: 'pointer'}} onClick={this.goHome}>iRadio</span>}
-              iconElementRight={<FlatButton label={this.state.userEmail ? this.state.userEmail + " | Sign Out" : "Not logged In"} onTouchTap={this.state.userID ? this.signOut : this.goHome} />}
+              titleStyle={{color: '#fff !important'}}
+              iconElementRight={<FlatButton style={{color: '#fff !important'}} label={this.state.userEmail ? this.state.userEmail + " | Sign Out" : "Not logged In"} onTouchTap={this.state.userID ? this.signOut : this.goHome} />}
               showMenuIconButton={false}
             />
           </MuiThemeProvider>

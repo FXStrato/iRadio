@@ -32,13 +32,6 @@ class Queue extends React.Component {
       });
       this.setState({queue: temp});
     })
-    //Temporary, trying to locate bug
-    this.queueRef.on('child_added', snapshot => {
-      console.log('child element was added');
-    })
-    this.queueRef.on('child_removed', snapshot => {
-      console.log('child element was removed');
-    })
   }
 
   handleOpen = (key, title) => {

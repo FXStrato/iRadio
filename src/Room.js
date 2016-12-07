@@ -41,7 +41,7 @@ class Room extends Component {
       }
     })
     firebase.database().ref('channels/' + this.props.params.roomID).once('value').then(snapshot => {
-      if(snapshot.val()) {
+      if(snapshot.val().nowPlaying) {
           this.setState({nowPlaying: snapshot.val().nowPlaying});
       }
     });
@@ -61,7 +61,7 @@ class Room extends Component {
     return (
       <div>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-          <Tabs value={this.state.value} onChange={this.handleChange}>
+          <Tabs value={this.state.value} onChange={this.handleChange} inkBarStyle={{backgroundColor: '#00E5FF'}}>
             <Tab label="Now Playing" value="np" style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
                 <Row>

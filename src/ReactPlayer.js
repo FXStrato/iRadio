@@ -24,7 +24,7 @@ class RadioPlayer extends React.Component {
 
   componentDidMount() {
 
-    console.log(firebase.auth().currentUser.uid);
+    //console.log(firebase.auth().currentUser.uid);
 
     // firebase.auth().signInWithEmailAndPassword("evan@test.com", "123123")
     //   .catch((err) => console.log(err));
