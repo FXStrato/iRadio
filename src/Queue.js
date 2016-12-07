@@ -15,9 +15,9 @@ class SongList extends React.Component {
     open: false
   }
 
-  componentWillUnmount = () => {
-    this.off();
-  }
+  // componentWillUnmount = () => {
+  //   this.off();
+  // }
 
   componentDidMount = () => {
     //this listener might not actually be working totally upon tab switch. Need to check this
@@ -30,11 +30,6 @@ class SongList extends React.Component {
         temp.push(item);
       });
       this.setState({queue: temp});
-    })
-    //Temporary, trying to locate bug
-    this.queueRef.on('child_added', snapshot => {
-    })
-    this.queueRef.on('child_removed', snapshot => {
     })
   }
 
@@ -59,23 +54,24 @@ class SongList extends React.Component {
   render() {
     let songList = _.map(this.state.queue, (song, index) => {
 
+
       var content = '';
       if(this.props.listType === 'queue') {
         content = <ListItem
-          style={{overflow: 'hidden'}}
+          style={{overflow: 'hidden', backgroundColor: '#1F1F1F', border: '1px #373737 solid', paddingBottom: '10px'}}
           innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
           key={song.key}
-          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
-          rightIcon={<DeleteIcon style={{cursor: 'pointer'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />}
+          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginLeft: '10px', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
+          rightIcon={this.props.user && <DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />}
           primaryText={<div style={{paddingTop: '20px', paddingRight: '50px', color:'white'}}>{song.title}</div>}
           secondaryText={<div style={{color:'white'}}>{song.channel} | {song.formatduration}</div>}
         />;
       } else {
         content = <ListItem
-          style={{overflow: 'hidden'}}
+          style={{overflow: 'hidden', backgroundColor: '#1F1F1F', border: '1px #373737 solid', paddingBottom: '10px'}}
           innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
           key={song.key}
-          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
+          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginLeft: '10px', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
           primaryText={<div style={{paddingTop: '20px', paddingRight: '50px', color:'white'}}>{song.title}</div>}
           secondaryText={<div style={{color:'white'}}>{song.channel} | {song.formatduration}</div>}
         />;

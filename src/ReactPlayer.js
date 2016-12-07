@@ -14,17 +14,7 @@ class RadioPlayer extends React.Component {
     super(props);
     this.state =
       {
-        nowPlaying:{
-          url: '',
-          baseUrl: '',
-          duration: 0,
-          formattedDuration: '',
-          title: '',
-          thumbnail: '',
-          channel: '',
-          progress: 0,
-          isPlaying: false
-        },
+        nowPlaying:null,
         queue:{},
         volume: 0.75
       };
@@ -38,29 +28,29 @@ class RadioPlayer extends React.Component {
       }
     });
 
-    var channelId = this.props.room;
-    let refPath = "channels/" + channelId;
-
-    let channelRef = firebase.database().ref(refPath);
-    channelRef.on("value", (snapshot) => {
-      var channelObject = snapshot.val();
-      var newState = this.state;
-      let queueInstance = channelObject.queue;
-      if(queueInstance) {
-        for(let track in queueInstance) {
-          if(queueInstance.hasOwnProperty(track)) {
-            queueInstance[track].key = track;
-          }
-        }
-        newState.queue = queueInstance;
+    var queueRef = firebase.database().ref("channels/" + this.props.room + "/queue");
+    var nowPlayingRef = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
+    nowPlayingRef.on('value', (snapshot) => {
+      var newNowPlaying = snapshot.val();
+      this.setState({nowPlaying:newNowPlaying});
+    });
+    queueRef.on('child_added', (snapshot) => {
+      var trackInstance = snapshot.val();
+      if(!this.state.nowPlaying) {
+        var item = trackInstance;
+        item.progress = 0;
+        item.isPlaying = true;
+        item.baseUrl = trackInstance.url;
+        nowPlayingRef.set(item);
+        this.setState({nowPlaying:item});
+        queueRef.child(snapshot.key).remove();
       }
-      let nowPlayingInstance = channelObject.nowPlaying;
+    });
+  }
 
-
-
-      newState.nowPlaying = nowPlayingInstance;
-      this.setState(newState);
-    })
+  componentWillUnmount() {
+    firebase.database().ref('users').off();
+    firebase.database().ref('channels').off();
   }
 
   //handles the playing and pausing of the video for the whole room. only admin should have control over thi
@@ -93,6 +83,7 @@ class RadioPlayer extends React.Component {
     historyRef.push(oldTrack);
 
     //get the object at the front of the queue
+
     var newTrack = null;
     queueRef.orderByKey().limitToFirst(1)
       .once("value", (snapshot) => {
@@ -106,7 +97,6 @@ class RadioPlayer extends React.Component {
           }
         }
       });
-
     if(newTrack) {
       firebase.database().ref(refPath + "/queue/" + newTrack.key).remove();
     }
@@ -120,7 +110,7 @@ class RadioPlayer extends React.Component {
     if(newTrack) {
       newNowPlaying = {
         url: newTrack.url,
-          baseUrl: newTrack.url,
+        baseUrl: newTrack.url,
         duration: newTrack.duration,
         formattedDuration: newTrack.formattedDuration,
         title: newTrack.title,
@@ -132,7 +122,7 @@ class RadioPlayer extends React.Component {
     }
     nowPlayingRef.set(newNowPlaying);
     roomRef.child("queue").set(newQueue);
-    this.setState({nowPlaying:null});
+    // this.setState({nowPlaying:null});
   };
 
   //for now, resets the queue
@@ -225,8 +215,6 @@ class RadioPlayer extends React.Component {
     this.handleForwardClick();
   };
 
-
-
   //handles a user's changing volume
   handleVolumeChange = (e, value) => {
     this.setState({volume:value});
@@ -234,7 +222,8 @@ class RadioPlayer extends React.Component {
 
   //renders the entire video player
   render() {
-
+    var isPlaying = false;
+    var title = '';
     var content = <div>There are currently no songs queued up!</div>;
     if(this.state.nowPlaying) {
 
@@ -255,37 +244,40 @@ class RadioPlayer extends React.Component {
         localStorage.removeItem("tempUrl");
       }
 
-      content = <div>
-        <div className="row">
-
-          <div className="col l8 offset-l2 offset-m1 m10 s12">
-            <VideoContainer
-              onProgress={this.onProgress}
-              onVideoEnd={this.onVideoEnd}
-              url={urlToInput}
-              nowPlaying={this.state.nowPlaying}
-              volume={this.state.volume}
-            />
-          </div>
-          <div className="col s12 center-align">
-            <h1 className="flow-text">{this.state.nowPlaying.title}</h1>
-          </div>
+      content =
+        <div className="col l8 offset-l2 offset-m1 m10 s12">
+          <VideoContainer
+            onProgress={this.onProgress}
+            onVideoEnd={this.onVideoEnd}
+            url={urlToInput}
+            nowPlaying={this.state.nowPlaying}
+            volume={this.state.volume}
+          />
         </div>
-        <div className="row">
-          <div className="col s12">
-            <PlaybackControls
-              isPlaying={this.state.nowPlaying.isPlaying}
-              playPauseCallback={this.handlePlayPauseClick}
-              forwardCallback={this.handleForwardClick}
-              backwardCallback={this.handleBackwardClick}
-              volumeCallback={this.handleVolumeChange}
-            />
-          </div>
-        </div>
-      </div>
+      isPlaying = this.state.nowPlaying.isPlaying;
+      title = this.state.nowPlaying.title
     }
 
-    return (content);
+    return (<div>
+      <div className="row">
+
+        {content}
+        <div className="col s12 center-align">
+          <h1 className="flow-text">{title}</h1>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col s12">
+          <PlaybackControls
+            isPlaying={isPlaying}
+            playPauseCallback={this.handlePlayPauseClick}
+            forwardCallback={this.handleForwardClick}
+            backwardCallback={this.handleBackwardClick}
+            volumeCallback={this.handleVolumeChange}
+          />
+        </div>
+      </div>
+    </div>);
   }
 }
 
@@ -294,8 +286,6 @@ class VideoContainer extends React.Component {
 
   //renders the video container
   render() {
-
-
     return (
       <ReactPlayer
         style={{pointerEvents: 'none'}}

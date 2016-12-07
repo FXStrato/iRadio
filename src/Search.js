@@ -181,10 +181,10 @@ class Search extends Component {
         let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], channel:elem.snippet.channelTitle, thumbnail: elem.snippet.thumbnails.high.url};
         return <ListItem
           onTouchTap={() => this.handleOpen(temp)}
-          style={{overflow: 'hidden'}}
+          style={{overflow: 'hidden', backgroundColor: '#1F1F1F', border: '1px #373737 solid', paddingBottom: '10px'}}
           innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
           key={elem.id.videoId}
-          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px'}} src={elem.snippet.thumbnails.default.url} alt={elem.id.videoId}/>}
+          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginLeft: '10px', marginRight: '10px'}} src={elem.snippet.thumbnails.default.url} alt={elem.id.videoId}/>}
           primaryText={<div style={{paddingTop: '20px'}}>{elem.snippet.title}</div>}
           secondaryText={this.state.durations[index] ? elem.snippet.channelTitle + ' | ' + this.state.durations[index] : elem.snippet.channelTitle + ' | Loading...'}
           secondaryTextLines={2}
