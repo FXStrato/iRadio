@@ -57,20 +57,20 @@ class SignInForm extends React.Component{
       <div>
         <Row>
           <Col s={12}>
-            <h1>Sign In Here!</h1>
+            <h1>Sign In</h1>
             <div style={{color: '#E53935'}}>{this.state.errorText}</div>
-            <form role="form">
-              <div className="form-group">
+            <form role="form" onSubmit={this.signIn}>
+              <div className="input-field">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
                   <TextField style={{color: '#039BE5'}} floatingLabelText="Email" fullWidth={true} type="email" name="email" onChange={(e) => {this.handleChange(e)}} />
                 </MuiThemeProvider>
               </div>
-              <div className="form-group">
+              <div className="input-field">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
                   <TextField style={{color: '#039BE5'}} floatingLabelText="Password" fullWidth={true} type="password" name="password" onChange={(e) => {this.handleChange(e)}}/>
                 </MuiThemeProvider>
               </div>
-              <div className="form-group">
+              <div className="input-field">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
                   <RaisedButton label={!this.state.icon && 'Sign In'} icon={this.state.icon} primary={true} disabled={this.state.disabled} labelStyle={{color: '#fff'}} onTouchTap={this.signIn}/>
                 </MuiThemeProvider>

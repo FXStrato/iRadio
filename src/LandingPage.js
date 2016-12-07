@@ -89,33 +89,31 @@ componentWillUnmount() {
     hashHistory.push('room/' + this.state.userHandle);
   }
 
-  handleAction = () => {
-    //if creating, init room. Acquire user handle
-    if(this.state.createDialog) {
-      let roomRef = firebase.database().ref('channels/' + this.state.userHandle);
-      roomRef.set({
-        listeners: {},
-        nowPlaying: {},
-        queue: {},
-        history: {},
-        owner: this.state.userHandle
-      })
-      roomRef.off();
-      this.auth();
-      this.handleClose();
-      hashHistory.push('room/' + this.state.userHandle);
-    } else {
-      //Need to run a check if room exists here.
-      let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
-        if(snapshot.val()) {
-          //True, means the room exists
-          hashHistory.push('room/' + this.state.roomName);
-        } else {
-          this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
-        }
-      });
-    }
+  handleCreateRoom = () => {
+    let roomRef = firebase.database().ref('channels/' + this.state.userHandle);
+    roomRef.set({
+      listeners: {},
+      nowPlaying: {},
+      queue: {},
+      history: {},
+      owner: this.state.userHandle
+    })
+    roomRef.off();
+    this.auth();
+    this.handleClose();
+    hashHistory.push('room/' + this.state.userHandle);
+  }
 
+  handleAction = () => {
+    //Need to run a check if room exists here.
+    let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
+      if(snapshot.val()) {
+        //True, means the room exists
+        hashHistory.push('room/' + this.state.roomName);
+      } else {
+        this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
+      }
+    });
   }
 
   render() {
@@ -127,7 +125,7 @@ componentWillUnmount() {
     />,
     <FlatButton
         label={this.state.createDialog ? "Create Room" : "Join Room"}
-        onTouchTap={this.handleAction}
+        onTouchTap={this.state.createDialog ? this.handleCreateRoom : this.handleAction}
     />]
 
     let content = null;
@@ -193,12 +191,16 @@ componentWillUnmount() {
            open={this.state.open}>
            {this.state.createDialog ? "Create a room to share music with friends!" : "Join a pre-existing friends room!"} <br/>
            {!this.state.createDialog && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField
-                floatingLabelText="Room ID"
-                id='joinroom-input'
-                onChange={this.handleChange}
-                errorText={this.state.errorText}
-              />
+              <form onSubmit={this.handleAction}>
+                <Col s={12} className="input-field">
+                  <TextField
+                    floatingLabelText="Room ID"
+                    id='joinroom-input'
+                    onChange={this.handleChange}
+                    errorText={this.state.errorText}
+                  />
+                </Col>
+              </form>
               </MuiThemeProvider>}
            </Dialog>
          </MuiThemeProvider>

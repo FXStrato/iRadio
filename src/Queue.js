@@ -15,9 +15,9 @@ class SongList extends React.Component {
     open: false
   }
 
-  // componentWillUnmount = () => {
-  //   this.off();
-  // }
+  componentWillUnmount = () => {
+    this.queueRef.off();
+  }
 
   componentDidMount = () => {
     //this listener might not actually be working totally upon tab switch. Need to check this
@@ -93,8 +93,8 @@ class SongList extends React.Component {
 
   return (
       <div>
-        {!this.state.queue &&
-        <h2>Nothing in Queue</h2>
+        {this.state.queue.length < 1 &&
+        <div className="center-align">Nothing In Queue</div>
         }
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
         <List>
