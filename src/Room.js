@@ -6,11 +6,10 @@ import {Tabs, Tab} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-
 import {Link, hashHistory} from 'react-router';
 import SwipeableViews from 'react-swipeable-views';
 import Search from './Search';
-import SongList from './Queue';
+import SongList from './SongList';
 import RadioPlayer from './ReactPlayer';
 
 //Room that will host all the functionality of our app. Need tabs for queue, history, and now playing
@@ -20,6 +19,8 @@ class Room extends Component {
     value: 0,
     userID: null,
     userEmail: null,
+    userHandle: '',
+    isOwner: false
   }
 
   componentWillUnmount = () => {
@@ -33,6 +34,12 @@ class Room extends Component {
       if(user) {
         this.setState({userID:user.uid});
         this.setState({userEmail:user.email})
+        firebase.database().ref('users/' + user.uid).once('value').then(snapshot=> {
+          if(snapshot.val()) {
+            if(snapshot.val().handle === this.props.params.roomID) this.setState({isOwner: true});
+            this.setState({userHandle: snapshot.val().handle})
+          }
+        });
       }
       else{
         this.setState({userID: null}); //null out the saved state
@@ -87,7 +94,7 @@ class Room extends Component {
                   <h1 className="flow-text center-align">Queue</h1>
                 </Col>
               </Row>
-              <SongList room={this.props.params.roomID} user={this.state.userID} listType="queue"/>
+              <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="queue"/>
             </div>
             <div className="container">
               <Row>
@@ -101,10 +108,12 @@ class Room extends Component {
               </Row>
             </div>
             <div className="container">
-              <h1 className="flow-text center-align">History</h1>
-              <p>
-                <SongList room={this.props.params.roomID} user={this.state.userID} listType="history"/>
-              </p>
+              <Row>
+                <Col s={12}>
+                  <h1 className="flow-text center-align">History</h1>
+                    <SongList room={this.props.params.roomID} user={this.state.userID} listType="history"/>
+                </Col>
+              </Row>
             </div>
           </SwipeableViews>
         </MuiThemeProvider>
