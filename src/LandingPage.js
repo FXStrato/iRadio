@@ -2,7 +2,7 @@
 import React from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {AppBar, FlatButton, Tabs, Tab, RaisedButton, Dialog, TextField} from 'material-ui';
+import {AppBar, FlatButton, Tabs, Tab, RaisedButton, Dialog, TextField, Avatar} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -11,17 +11,17 @@ import SignInForm from './SignIn.js';
 import SignUpForm from './SignUp.js'
 
 
-//This component will need an auth listener; if the user is authed, then they shouldn't see sign in or sign up options, but create or join rooms.
-
 class LandingPage extends React.Component {
   state = {
     signin: true,
     open: false,
     createDialog: false,
     roomName: '',
+    errorText: '',
     userEmail: 'init',
     userID: 'init',
-    roomMade: null
+    userHandle: '',
+    roomMade: null,
   }
 
   componentDidMount() {
@@ -31,14 +31,18 @@ class LandingPage extends React.Component {
       this.setState({userID:user.uid});
       this.setState({userEmail:user.email})
       //Check to see if they have made a room already
-      firebase.database().ref('channels/jeff').once('value').then(snapshot => {
-        if(snapshot.val().owner) {
-          this.setState({roomMade: true})
-        } else {
-          this.setState({roomMade: false})
+      firebase.database().ref('users/' + user.uid).once('value').then(snapshot=> {
+        if(snapshot.val()) {
+          this.setState({userHandle: snapshot.val().handle})
+          firebase.database().ref('channels/' + snapshot.val().handle).once('value').then(snapshot => {
+            if(snapshot.val()) {
+              this.setState({roomMade: true})
+            } else {
+              this.setState({roomMade: false})
+            }
+          });
         }
       });
-
     }
     else{
       this.setState({userID: null}); //null out the saved state
@@ -60,10 +64,14 @@ componentWillUnmount() {
   handleChange = event => {
     var value = event.target.value;
     this.setState({roomName:value});
+    if(this.state.errorText !== '') {
+      this.setState({errorText: ''});
+    }
   }
 
   handleClose = () => {
     this.setState({open: false});
+    this.setState({errorText: ''})
   };
 
   handleOpen = isCreate => {
@@ -78,34 +86,34 @@ componentWillUnmount() {
 
   handleJoinOwnRoom = () => {
     //Get user handle, and join the room
-    hashHistory.push('room/jeff');
+    hashHistory.push('room/' + this.state.userHandle);
+  }
+
+  handleCreateRoom = () => {
+    let roomRef = firebase.database().ref('channels/' + this.state.userHandle);
+    roomRef.set({
+      listeners: {},
+      nowPlaying: {},
+      queue: {},
+      history: {},
+      owner: this.state.userHandle
+    })
+    roomRef.off();
+    this.auth();
+    this.handleClose();
+    hashHistory.push('room/' + this.state.userHandle);
   }
 
   handleAction = () => {
-    this.handleClose();
-    //if creating, init room. Dummy data is inserted for now. Else, join the given room
-    if(this.state.createDialog) {
-      let roomRef = firebase.database().ref('channels/jeff');
-      roomRef.set({
-        listeners: {},
-        nowPlaying: {
-          title: 'Shelter',
-          channel: 'Porter Robinson',
-          url: 'https://www.youtube.com/watch?v=fzQ6gRAEoy0',
-          thumbnail: 'https://i.ytimg.com/vi/fzQ6gRAEoy0/hqdefault.jpg?custom=true&w=246&h=138&stc=true&jpg444=true&jpgq=90&sp=68&sigh=RXcJaXW829FSP-JrIe8E6MTKHa4'
-        },
-        queue: {},
-        history: {},
-        owner: 'jeff'
-      })
-      roomRef.off();
-      this.auth();
-      hashHistory.push('room/jeff');
-    } else {
-      //Need to run a check if room exists here.
-      hashHistory.push('room/' + this.state.roomName);
-    }
-
+    //Need to run a check if room exists here.
+    let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
+      if(snapshot.val()) {
+        //True, means the room exists
+        hashHistory.push('room/' + this.state.roomName);
+      } else {
+        this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
+      }
+    });
   }
 
   render() {
@@ -117,23 +125,31 @@ componentWillUnmount() {
     />,
     <FlatButton
         label={this.state.createDialog ? "Create Room" : "Join Room"}
-        onTouchTap={this.handleAction}
+        onTouchTap={this.state.createDialog ? this.handleCreateRoom : this.handleAction}
     />]
 
     let content = null;
     if(firebase.auth().currentUser) {
       content = <div>
+        <Row>
+          <Col s={12} className="center-align">
+            <h1>Let The Music Flow</h1>
+            <div className="flow-text">
+              Host your own room and share your music, or get the room ID of a friend and join them!
+            </div>
+          </Col>
+        </Row>
         <Row className="center-align">
           <br/>
           <Col s={12}>
             {this.state.roomMade === true && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Enter Created Room" onTouchTap={this.handleJoinOwnRoom}/>
+              <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Enter Your Room" onTouchTap={this.handleJoinOwnRoom}/>
             </MuiThemeProvider>}
             {this.state.roomMade === false && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
               <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Create Room" onTouchTap={() => {this.handleOpen(true)}}/>
             </MuiThemeProvider>}
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} secondary={true} label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+              <RaisedButton labelStyle={{color:'#fff'}} backgroundColor='#0DBAAD' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
             </MuiThemeProvider>
           </Col>
         </Row>
@@ -141,35 +157,50 @@ componentWillUnmount() {
     } else if(this.state.userID !== 'init') {
       content =  <div>
         <Row>
-          <Col s={12}>
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap}/>
-            </MuiThemeProvider>
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} secondary={true} label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
-            </MuiThemeProvider>
+          <br/>
+          <Col s={12} m={6} l={6}>
+            <h1>Welcome to iRadio!</h1>
+            <div className="flow-text">
+              Queue songs to play, add songs to a friend's room, or make your own room in iRadio!
+            </div>
+            <br/>
+            <div>
+              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <RaisedButton style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap} backgroundColor="#03A9F4"/>
+              </MuiThemeProvider>
+              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <RaisedButton labelStyle={{color:'#fff'}} style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} backgroundColor='#0DBAAD' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+              </MuiThemeProvider>
+            </div>
+          </Col>
+          <Col s={12} m={6} l={6}>
+            {this.state.signin ? <SignInForm/> : <SignUpForm/>}
           </Col>
         </Row>
-            {this.state.signin ? <SignInForm/> : <SignUpForm/>}
       </div>
     }
 
     return (
-      <div>
+      <div className="container">
         {content}
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
            <Dialog
-           title={'Create Your Room'.toUpperCase()}
+           title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join A Room'.toUpperCase()}
            actions={actions}
            modal={false}
            open={this.state.open}>
            {this.state.createDialog ? "Create a room to share music with friends!" : "Join a pre-existing friends room!"} <br/>
            {!this.state.createDialog && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <TextField
-                floatingLabelText="Room ID"
-                id='joinroom-input'
-                onChange={this.handleChange}
-              />
+              <form onSubmit={this.handleAction}>
+                <Col s={12} className="input-field">
+                  <TextField
+                    floatingLabelText="Room ID"
+                    id='joinroom-input'
+                    onChange={this.handleChange}
+                    errorText={this.state.errorText}
+                  />
+                </Col>
+              </form>
               </MuiThemeProvider>}
            </Dialog>
          </MuiThemeProvider>

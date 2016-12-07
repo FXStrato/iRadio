@@ -74,6 +74,7 @@ class Search extends Component {
   //Upon submitting request, search youtube, and return search results.
   onNewRequest(searchTerm) {
     this.setState({finished: false});
+    this.setState({durations: []});
     document.querySelector('#list-progress').style.display = 'inline-block';
     const
       self   = this,
@@ -94,8 +95,9 @@ class Search extends Component {
     });
   }
 
-  //Upon obtaining list of promises, return the youtube search results and promises for each result containing duration
+  //Upon obtaining list of promises, calculate the durations for each song
   getDurations = items => {
+    this.setState({durations: []});
     //This currently only gives me promises
     let temp = _.map(items, elem => {
       return fetch('https://www.googleapis.com/youtube/v3/videos?id=' + elem.id.videoId + '&part=contentDetails&key=' + this.props.apiKey)
@@ -123,11 +125,10 @@ class Search extends Component {
       <MuiThemeProvider className="center-align" muiTheme={getMuiTheme(darkBaseTheme)}>
         <List>
           <ListItem
-            className="truncate"
             disabled={true}
             innerDivStyle={{padding: '0'}}
             key={'dialog-'+result.url}
-            leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px'}} src={result.thumbnail} alt={result.url}/>}
+            leftAvatar={<img className="responsive-img" style={{position: 'none', marginRight: '10px', width: '210px'}} src={result.thumbnail} alt={result.url}/>}
             primaryText={<div style={{paddingTop: '20px'}}>{result.title}</div>}
             secondaryText={result.channel + ' | ' + result.duration}
             secondaryTextLines={2}
@@ -143,11 +144,34 @@ class Search extends Component {
     this.setState({open: false});
   };
 
-  handleSubmit = result => {
+  handleSubmit = () => {
     //Add song to firebase. Should be attached to add to queue button
-    console.log(this.state.song);
+    let song = this.state.song;
+    let roomRef = firebase.database().ref('channels/' + this.props.room + '/queue');
+    let item = {
+      duration: this.convertToSeconds(song.duration),
+      formatduration: song.duration,
+      title: song.title,
+      url: song.url,
+      channel: song.channel,
+      thumbnail: song.thumbnail,
+      insertTime: firebase.database.ServerValue.TIMESTAMP
+    }
+    roomRef.push(item).off();
     this.setState({open: false});
     this.setState({inputValue: ''});
+    this.props.callback(true);
+  }
+
+  convertToSeconds = str => {
+    let p = str.split(':'),
+        s = 0, m = 1;
+
+    while (p.length > 0) {
+        s += m * parseInt(p.pop(), 10);
+        m *= 60;
+    }
+    return s;
   }
 
 
@@ -156,13 +180,13 @@ class Search extends Component {
     if(this.state.finished) {
       let callback = this.props.callback;
       content = _.map(this.state.results, (elem, index) => {
-        let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], channel:elem.snippet.channelTitle, thumbnail: elem.snippet.thumbnails.default.url};
+        let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], channel:elem.snippet.channelTitle, thumbnail: elem.snippet.thumbnails.high.url};
         return <ListItem
           onTouchTap={() => this.handleOpen(temp)}
-          style={{overflow: 'hidden'}}
+          style={{overflow: 'hidden', backgroundColor: '#1F1F1F', border: '1px #373737 solid', paddingBottom: '10px'}}
           innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
           key={elem.id.videoId}
-          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginRight: '10px'}} src={elem.snippet.thumbnails.default.url} alt={elem.id.videoId}/>}
+          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginLeft: '10px', marginRight: '10px'}} src={elem.snippet.thumbnails.default.url} alt={elem.id.videoId}/>}
           primaryText={<div style={{paddingTop: '20px'}}>{elem.snippet.title}</div>}
           secondaryText={this.state.durations[index] ? elem.snippet.channelTitle + ' | ' + this.state.durations[index] : elem.snippet.channelTitle + ' | Loading...'}
           secondaryTextLines={2}
@@ -186,7 +210,7 @@ class Search extends Component {
 
     return (
       <Row>
-        <Col s={12} m={12} l={6} className="center-align">
+        <Col s={12} m={12} l={12} className="center-align">
           <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
             <AutoComplete
               id="searchbar"
