@@ -87,7 +87,7 @@ class App extends Component {
             <Paper zDepth={1}>
                 <Toolbar style={{backgroundColor: '#262626',}}>
                   <ToolbarGroup onClick={this.goHome}>
-                    <FlatButton style={{height: 50, paddingTop: '5px', paddingRight: 10}}>
+                    <FlatButton style={{height: 50, paddingTop: '5px', paddingRight: 10, marginLeft: '-15px'}}>
                       <img style={{float: 'left', width: '50px', height: '50px'}} src={mainIcon} alt="Network by Dmitry Mirolyubov from the Noun Project"/>
                       <span className="flow-text">iRadio</span>
                     </FlatButton>

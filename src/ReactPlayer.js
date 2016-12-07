@@ -222,7 +222,7 @@ class RadioPlayer extends React.Component {
   render() {
     var isPlaying = false;
     var title = '';
-    var content = <div>There are currently no songs queued up!</div>;
+    var content = <div className="center-align">There are currently no songs queued up!</div>;
     if(this.state.nowPlaying) {
 
       var updated = JSON.parse(localStorage.getItem("updated"));
