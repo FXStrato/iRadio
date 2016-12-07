@@ -86,7 +86,7 @@ componentWillUnmount() {
 
   handleJoinOwnRoom = () => {
     //Get user handle, and join the room
-    hashHistory.push('room/jeff');
+    hashHistory.push('room/' + this.state.userHandle);
   }
 
   handleAction = () => {

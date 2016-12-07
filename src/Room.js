@@ -21,14 +21,26 @@ class Room extends Component {
   state = {
     roomID: '',
     nowPlaying: {},
-    value: 'np'
+    value: 'np',
+    userID: null,
+    userEmail: null,
   }
 
 
   componentDidMount = () => {
-    //Obtain information from the passed in roomID. Currently just pulling from nowPlaying, since that was hardcoded in
     this.setState({roomID: this.props.params.roomID})
-    let roomRef = firebase.database().ref('channels/' + this.props.params.roomID).once('value').then(snapshot => {
+    /* Add a listener and callback for authentication events */
+    this.auth = firebase.auth().onAuthStateChanged(user => {
+      if(user) {
+        this.setState({userID:user.uid});
+        this.setState({userEmail:user.email})
+      }
+      else{
+        this.setState({userID: null}); //null out the saved state
+        this.setState({userEmail: null})
+      }
+    })
+    firebase.database().ref('channels/' + this.props.params.roomID).once('value').then(snapshot => {
       if(snapshot.val()) {
           this.setState({nowPlaying: snapshot.val().nowPlaying});
       }

@@ -16,9 +16,9 @@ class Queue extends React.Component {
     open: false
   }
 
-  componentWillUnmount = () => {
-    this.off();
-  }
+  // componentWillUnmount = () => {
+  //   this.off();
+  // }
 
   componentDidMount = () => {
     //this listener might not actually be working totally upon tab switch. Need to check this
