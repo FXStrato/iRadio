@@ -24,8 +24,10 @@ class RadioPlayer extends React.Component {
 
   componentDidMount() {
 
-    firebase.auth().signInWithEmailAndPassword("evan@test.com", "123123")
-      .catch((err) => console.log(err));
+    //console.log(firebase.auth().currentUser.uid);
+
+    // firebase.auth().signInWithEmailAndPassword("evan@test.com", "123123")
+    //   .catch((err) => console.log(err));
     var channelId = this.props.room;
     let refPath = "channels/" + channelId;
 
@@ -34,7 +36,9 @@ class RadioPlayer extends React.Component {
       var channelObject = snapshot.val();
       let queueInstance = channelObject.queue;
       for(let track in queueInstance) {
-        queueInstance[track].key = track;
+        if(queueInstance.hasOwnProperty(track)) {
+          queueInstance[track].key = track;
+        }
       }
       var newState = this.state;
       newState.queue = queueInstance;
@@ -62,8 +66,10 @@ class RadioPlayer extends React.Component {
       .once("value", (snapshot) => {
         var newTrackContainer = snapshot.val();
         for (var track in newTrackContainer) {
-          newTrack = newTrackContainer[track];
-          newTrack.key = track;
+          if(newTrackContainer.hasOwnProperty(track)) {
+            newTrack = newTrackContainer[track];
+            newTrack.key = track;
+          }
         }
       });
 
@@ -85,6 +91,7 @@ class RadioPlayer extends React.Component {
 
     var nowPlayingRef = firebase.database().ref(refPath);
     nowPlayingRef.child("nowPlaying").set(newNowPlaying);
+    nowPlayingRef.child("queue").set(newQueue);
   };
 
   //for now, resets the queue
@@ -150,19 +157,20 @@ class RadioPlayer extends React.Component {
 
   //converts a time elapsed value into a valid youtube timestamp
   convertToYoutubeTimestamp = timeElapsed => {
+    var radix = 10;
     var hours = "";
     if(timeElapsed > 3600) {
-      hours = "" + (parseInt(timeElapsed / 3600)) + "h";
+      hours = "" + (parseInt(timeElapsed / 3600, radix)) + "h";
       timeElapsed %= 3600;
     }
     var minutes = "";
     if(timeElapsed > 60) {
-      minutes =  "" + parseInt(timeElapsed / 60) + "m";
+      minutes =  "" + parseInt(timeElapsed / 60, radix) + "m";
       timeElapsed %= 60;
     }
     var seconds = "";
     if(timeElapsed !== 0) {
-      seconds = "" + parseInt(timeElapsed) + "s";
+      seconds = "" + parseInt(timeElapsed, radix) + "s";
     }
     if(hours || minutes || seconds) {
       return "&t=" + hours + minutes + seconds;
@@ -175,6 +183,8 @@ class RadioPlayer extends React.Component {
   onVideoEnd = () => {
     this.handleForwardClick();
   };
+
+
 
   //handles a user's changing volume
   handleVolumeChange = (e, value) => {
@@ -241,29 +251,6 @@ class VideoContainer extends React.Component {
     }
   }
 
-  //converts a time elapsed timestamp to a query string recognized by youtube
-  convertToYoutubeTimestamp(timeElapsed) {
-    var hours = "";
-    if(timeElapsed > 3600) {
-      hours = "" + (parseInt(timeElapsed / 3600)) + "h";
-      timeElapsed %= 3600;
-    }
-    var minutes = "";
-    if(timeElapsed > 60) {
-      minutes =  "" + parseInt(timeElapsed / 60) + "m";
-      timeElapsed %= 60;
-    }
-    var seconds = "";
-    if(timeElapsed !== 0) {
-      seconds = "" + parseInt(timeElapsed) + "s";
-    }
-    if(hours || minutes || seconds) {
-      return "&t=" + hours + minutes + seconds;
-    } else {
-      return "";
-    }
-  }
-
   //renders the video container
   render() {
     return (
@@ -287,6 +274,7 @@ class VideoContainer extends React.Component {
 
 //Playback controls for the Radio Player
 class PlaybackControls extends React.Component {
+
   constructor(props) {
     super(props);
   }
