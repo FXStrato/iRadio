@@ -185,7 +185,7 @@ class SignUpForm extends React.Component {
       <div>
         <Row>
           <Col s={12}>
-            <h1>Sign Up Here!</h1>
+            <h1>Sign Up</h1>
             <form role="form">
               <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>

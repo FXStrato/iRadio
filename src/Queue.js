@@ -5,7 +5,6 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {List, ListItem, Dialog, FlatButton} from 'material-ui';
 import firebase from 'firebase';
-import {cyanA400, transparent} from 'material-ui/styles/colors';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 class Queue extends React.Component {
@@ -16,12 +15,11 @@ class Queue extends React.Component {
     open: false
   }
 
-  // componentWillUnmount = () => {
-  //   this.off();
-  // }
+  componentWillUnmount = () => {
+    this.queueRef.off();
+  }
 
   componentDidMount = () => {
-    //this listener might not actually be working totally upon tab switch. Need to check this
     this.queueRef = firebase.database().ref('channels/' + this.props.room + '/queue');
     this.queueRef.on('value', snapshot => {
       let temp = [];
@@ -79,8 +77,8 @@ class Queue extends React.Component {
 
   return (
       <div>
-        {!this.state.queue &&
-        <h2>Nothing in Queue</h2>
+        {this.state.queue.length < 1 &&
+        <div className="center-align">Nothing In Queue</div>
         }
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
         <List>
