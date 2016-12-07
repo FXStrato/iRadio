@@ -78,17 +78,7 @@ class App extends Component {
    })
  }
 
-  //Callback to handle search results
-  searchCallback = result => {
-    console.log(result);
-  }
-
   render() {
-
-    //Can add a join button if in a room
-    if(hashHistory.getCurrentLocation().pathname.indexOf('room') !== -1) {
-
-    }
 
     return (
       <div>

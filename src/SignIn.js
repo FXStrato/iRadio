@@ -57,7 +57,7 @@ class SignInForm extends React.Component{
       <div>
         <Row>
           <Col s={12}>
-            <h1>Sign In Here!</h1>
+            <h1>Sign In</h1>
             <div style={{color: '#E53935'}}>{this.state.errorText}</div>
             <form role="form" onSubmit={this.signIn}>
               <div className="input-field">

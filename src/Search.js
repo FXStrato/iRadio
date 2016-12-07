@@ -155,7 +155,7 @@ class Search extends Component {
       channel: song.channel,
       thumbnail: song.thumbnail
     }
-    roomRef.push(item);
+    roomRef.push(item).off();
     this.setState({open: false});
     this.setState({inputValue: ''});
     this.props.callback(true);
