@@ -135,7 +135,7 @@ componentWillUnmount() {
           <Col s={12} className="center-align">
             <h1>Let The Music Flow</h1>
             <div className="flow-text">
-              Host your own room and share your music, or find friends to join!
+              Host your own room and share your music, or get the room ID of a friend and join them!
             </div>
           </Col>
         </Row>
@@ -143,7 +143,7 @@ componentWillUnmount() {
           <br/>
           <Col s={12}>
             {this.state.roomMade === true && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Enter Created Room" onTouchTap={this.handleJoinOwnRoom}/>
+              <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Enter Your Room" onTouchTap={this.handleJoinOwnRoom}/>
             </MuiThemeProvider>}
             {this.state.roomMade === false && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
               <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Create Room" onTouchTap={() => {this.handleOpen(true)}}/>
@@ -161,7 +161,7 @@ componentWillUnmount() {
           <Col s={12} m={6} l={6}>
             <h1>Welcome to iRadio!</h1>
             <div className="flow-text">
-              Find a room to join, or sign up to queue songs in your own room!
+              Queue songs to play, add songs to a friend's room, or make your own room in iRadio!
             </div>
             <br/>
             <div>
