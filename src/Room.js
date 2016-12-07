@@ -5,7 +5,7 @@ import {Row, Col} from 'react-materialize';
 import {Tabs, Tab} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+import Theme from './muiTheme.js';
 import {Link, hashHistory} from 'react-router';
 import SwipeableViews from 'react-swipeable-views';
 import Search from './Search';
@@ -61,19 +61,19 @@ class Room extends Component {
   render() {
     return (
       <div>
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-          <Tabs value={this.state.value} onChange={this.handleChange} inkBarStyle={{backgroundColor: '#00E5FF'}}>
-            <Tab label="Now Playing" value={0} style={{backgroundColor: '#424242', color: '#fff'}}>
+        <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+          <Tabs value={this.state.value} onChange={this.handleChange}>
+            <Tab label="Now Playing" value={0}>
             </Tab>
-            <Tab label="Queue" value={1} style={{backgroundColor: '#424242', color: '#fff'}}>
+            <Tab label="Queue" value={1}>
             </Tab>
-            <Tab label="Search" value={2} style={{backgroundColor: '#424242', color: '#fff'}}>
+            <Tab label="Search" value={2}>
             </Tab>
-            <Tab label="History" value={3} style={{backgroundColor: '#424242', color: '#fff'}}>
+            <Tab label="History" value={3}>
             </Tab>
           </Tabs>
         </MuiThemeProvider>
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+        <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
           <SwipeableViews
             index={this.state.value}
             onChangeIndex={this.handleChange}>

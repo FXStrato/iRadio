@@ -6,6 +6,9 @@ import firebase from 'firebase';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ForwardIcon from 'material-ui/svg-icons/av/fast-forward';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import Theme from './muiTheme.js';
 
 //RadioPlayer componenet that has both the video container and the playback controls
 class RadioPlayer extends React.Component {
@@ -313,6 +316,7 @@ class PlaybackControls extends React.Component {
   //renders the playback controls
   render() {
     return (
+      <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
       <div className="row">
         {this.props.isOwner &&
           <div>
@@ -341,6 +345,7 @@ class PlaybackControls extends React.Component {
             />
           </div>
       </div>
+      </MuiThemeProvider>
     );
   }
 }

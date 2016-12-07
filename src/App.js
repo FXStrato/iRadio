@@ -7,11 +7,11 @@ import RadioPlayer from './ReactPlayer';
 import Search from './Search';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+import Theme from './muiTheme.js';
 import firebase from 'firebase';
 import {Link, hashHistory} from 'react-router';
 import mainIcon from './img/mainIcon.png';
-
+import './index.css';
 import LandingPage from './LandingPage';
 
 class App extends Component {
@@ -83,9 +83,9 @@ class App extends Component {
     return (
       <div>
         <header>
-          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+          <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
             <Paper zDepth={1}>
-                <Toolbar style={{backgroundColor: '#262626',}}>
+                <Toolbar>
                   <ToolbarGroup onClick={this.goHome}>
                     <FlatButton style={{height: 50, paddingTop: '5px', paddingRight: 10}}>
                       <img style={{float: 'left', width: '50px', height: '50px'}} src={mainIcon} alt="Network by Dmitry Mirolyubov from the Noun Project"/>
@@ -94,7 +94,7 @@ class App extends Component {
                   </ToolbarGroup>
                   <ToolbarGroup>
                     <IconMenu
-                      iconButtonElement={<IconButton style={{marginTop: '-15px'}} disabled={this.state.userHandle ? false : true}>{this.state.userHandle  && <Avatar backgroundColor={'#5C5C5C'} color={'#00E5FF'}>{this.state.userHandle.charAt(0)}</Avatar>}</IconButton>}
+                      iconButtonElement={<IconButton style={{marginTop: '-15px'}} disabled={this.state.userHandle ? false : true}>{this.state.userHandle  && <Avatar className="avatar" fontSize='30px'>{this.state.userHandle.charAt(0)}</Avatar>}</IconButton>}
                       anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                       targetOrigin={{horizontal: 'right', vertical: 'top'}}
                     >

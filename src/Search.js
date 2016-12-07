@@ -11,7 +11,7 @@ import _ from 'lodash';
 import ytDurationFormat from 'youtube-duration-format';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+import Theme from './muiTheme.js';
 import 'whatwg-fetch'; //for polyfill
 
 const googleAutoSuggestURL = '//suggestqueries.google.com/complete/search?client=youtube&ds=yt&q=';
@@ -122,7 +122,7 @@ class Search extends Component {
     this.setState({song: result});
     let text = <div>
       <p className="flow-text">Song Queue Confirmation</p>
-      <MuiThemeProvider className="center-align" muiTheme={getMuiTheme(darkBaseTheme)}>
+      <MuiThemeProvider className="center-align" muiTheme={getMuiTheme(Theme)}>
         <List>
           <ListItem
             disabled={true}
@@ -211,11 +211,11 @@ class Search extends Component {
     return (
       <Row>
         <Col s={12} m={12} l={12} className="center-align">
-          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+          <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
             <AutoComplete
               id="searchbar"
               fullWidth={true}
-              style={{color: '#039BE5'}}
+              style={{color: '#fff'}}
               searchText={this.state.inputValue}
               floatingLabelText={this.props.placeHolder}
               filter={AutoComplete.noFilter}
@@ -224,18 +224,18 @@ class Search extends Component {
               onUpdateInput={this.onUpdateInput}
               onNewRequest={this.onNewRequest} />
           </MuiThemeProvider>
-          <MuiThemeProvider className="center-align" muiTheme={getMuiTheme(darkBaseTheme)}>
-            <CircularProgress style={{display: 'none'}} id="list-progress" size={45}/>
+          <MuiThemeProvider className="center-align" muiTheme={getMuiTheme(Theme)}>
+            <CircularProgress color="#01579B" style={{display: 'none'}} id="list-progress" size={45}/>
           </MuiThemeProvider>
         </Col>
         <Col s={12}>
-          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+          <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
             <List style={{height: '600px', overflowY:'auto'}}>
               {content}
             </List>
           </MuiThemeProvider>
         </Col>
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+        <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
           <Dialog
             title={this.state.dialogText}
             actions={actions}
@@ -245,7 +245,6 @@ class Search extends Component {
           </Dialog>
         </MuiThemeProvider>
       </Row>
-
     );
   }
 }

@@ -6,8 +6,7 @@ import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-
+import Theme from './muiTheme.js';
 
 class SignInForm extends React.Component{
   constructor(props){
@@ -61,18 +60,18 @@ class SignInForm extends React.Component{
             <div style={{color: '#E53935'}}>{this.state.errorText}</div>
             <form role="form" onSubmit={this.signIn}>
               <div className="input-field">
-                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <TextField style={{color: '#039BE5'}} floatingLabelText="Email" fullWidth={true} type="email" name="email" onChange={(e) => {this.handleChange(e)}} />
+                <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                  <TextField floatingLabelText="Email" fullWidth={true} type="email" name="email" onChange={(e) => {this.handleChange(e)}} />
                 </MuiThemeProvider>
               </div>
               <div className="input-field">
-                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <TextField style={{color: '#039BE5'}} floatingLabelText="Password" fullWidth={true} type="password" name="password" onChange={(e) => {this.handleChange(e)}}/>
+                <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                  <TextField floatingLabelText="Password" fullWidth={true} type="password" name="password" onChange={(e) => {this.handleChange(e)}}/>
                 </MuiThemeProvider>
               </div>
               <div className="input-field">
-                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <RaisedButton label={!this.state.icon && 'Sign In'} icon={this.state.icon} primary={true} disabled={this.state.disabled} labelStyle={{color: '#fff'}} onTouchTap={this.signIn}/>
+                <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                  <RaisedButton label={!this.state.icon && 'Sign In'} icon={this.state.icon} primary={true} disabled={this.state.disabled} onTouchTap={this.signIn}/>
                 </MuiThemeProvider>
               </div>
             </form>

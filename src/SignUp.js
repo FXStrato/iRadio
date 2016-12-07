@@ -6,8 +6,7 @@ import {Row, Col} from 'react-materialize';
 import firebase from 'firebase';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-
+import Theme from './muiTheme.js';
 
 /**
  * A form for signing up and logging into a website.
@@ -188,27 +187,27 @@ class SignUpForm extends React.Component {
             <h1>Sign Up</h1>
             <form role="form">
               <div className="form-group">
-                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <TextField id="signin-email" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={this.handleEmailValidate} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
+                <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                  <TextField id="signin-email" fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={this.handleEmailValidate} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
                 </MuiThemeProvider>
               </div>
               <div className="form-group">
-                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <TextField id="signin-user" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="User Handle" name="user" type="text" onChange={this.handleUserValidate} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length and not contain special characters or spaces':''} />
+                <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                  <TextField id="signin-user" fullWidth={true} floatingLabelText="User Handle" name="user" type="text" onChange={this.handleUserValidate} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length and not contain special characters or spaces':''} />
                 </MuiThemeProvider>
               </div>
               <div className="form-group">
-                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <TextField id="signin-password" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
+                <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                  <TextField id="signin-password" fullWidth={true} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
                 </MuiThemeProvider>
               </div>
               <div className="form-group">
-                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <TextField id="signin-user" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Confirm Password" name="match" type="password" onChange={this.handleMatchValidate} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
+                <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                  <TextField id="signin-user" fullWidth={true} floatingLabelText="Confirm Password" name="match" type="password" onChange={this.handleMatchValidate} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
                 </MuiThemeProvider>
               </div>
-              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                <RaisedButton label="Sign Up" labelStyle={!buttonDisabled ? {color: '#fff'} : {}} disabled={buttonDisabled} primary={true} onTouchTap={(e) => {this.signUp(e)}}/>
+              <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                <RaisedButton label="Sign Up" disabled={buttonDisabled} primary={true} onTouchTap={(e) => {this.signUp(e)}}/>
               </MuiThemeProvider>
             </form>
           </Col>

@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+import Theme from './muiTheme.js';
 import {List, ListItem, Dialog, FlatButton} from 'material-ui';
 import firebase from 'firebase';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
@@ -67,9 +67,9 @@ class SongList extends React.Component {
         innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
         key={song.key}
         leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginLeft: '10px', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
-        rightIcon={this.props.isOwner ? <DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />: <div></div>}
-        primaryText={<div style={{paddingTop: '20px', paddingRight: '50px', color:'white'}}>{song.title}</div>}
-        secondaryText={<div style={{color:'white'}}>{song.channel} | {song.formatduration}</div>}
+        rightIcon={this.props.isOwner ? <DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#fff'} />: <div></div>}
+        primaryText={<div style={{paddingTop: '20px', paddingRight: '50px'}}>{song.title}</div>}
+        secondaryText={<div>{song.channel} | {song.formatduration}</div>}
       />;
       return content;
     });
@@ -90,12 +90,12 @@ class SongList extends React.Component {
         {this.state.queue.length < 1 &&
         <div className="center-align">Nothing In {isQueue ? 'Queue' : 'History'}</div>
         }
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+        <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
         <List>
           {songList}
         </List>
         </MuiThemeProvider>
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+        <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
            <Dialog
            title={isQueue ? 'Deleting Song From Queue'.toUpperCase() : 'Deleting Song From History'.toUpperCase()}
            actions={actions}

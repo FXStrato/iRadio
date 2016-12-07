@@ -5,7 +5,7 @@ import {Row, Col} from 'react-materialize';
 import {AppBar, FlatButton, Tabs, Tab, RaisedButton, Dialog, TextField, Avatar} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+import Theme from './muiTheme.js';
 import {Link, hashHistory} from 'react-router';
 import SignInForm from './SignIn.js';
 import SignUpForm from './SignUp.js'
@@ -142,14 +142,14 @@ componentWillUnmount() {
         <Row className="center-align">
           <br/>
           <Col s={12}>
-            {this.state.roomMade === true && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Enter Your Room" onTouchTap={this.handleJoinOwnRoom}/>
+            {this.state.roomMade === true && <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+              <RaisedButton primary={true} style={{marginRight: '10px'}} label="Enter Your Room" onTouchTap={this.handleJoinOwnRoom}/>
             </MuiThemeProvider>}
-            {this.state.roomMade === false && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} primary={true} style={{marginRight: '10px'}} label="Create Room" onTouchTap={() => {this.handleOpen(true)}}/>
+            {this.state.roomMade === false && <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+              <RaisedButton primary={true} style={{marginRight: '10px'}} label="Create Room" onTouchTap={() => {this.handleOpen(true)}}/>
             </MuiThemeProvider>}
-            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <RaisedButton labelStyle={{color:'#fff'}} backgroundColor='#0DBAAD' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+            <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+              <RaisedButton backgroundColor='#607D8B' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
             </MuiThemeProvider>
           </Col>
         </Row>
@@ -161,15 +161,15 @@ componentWillUnmount() {
           <Col s={12} m={6} l={6}>
             <h1>Welcome to iRadio!</h1>
             <div className="flow-text">
-              Queue songs to play, add songs to a friend's room, or make your own room in iRadio!
+              Queue songs to play, add songs to a friend&#39;s room, or make your own room in iRadio!
             </div>
             <br/>
             <div>
-              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                <RaisedButton style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap} backgroundColor="#03A9F4"/>
+              <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                <RaisedButton style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} label={this.state.signin ? "Go to Sign Up" : "Go to Sign In"} onTouchTap={this.handleTap} backgroundColor="#1976D2"/>
               </MuiThemeProvider>
-              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                <RaisedButton labelStyle={{color:'#fff'}} style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} backgroundColor='#0DBAAD' label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
+              <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
+                <RaisedButton labelStyle={{color:'#fff'}} style={{width: '45%', marginLeft: '5px', marginRight: '5px'}} backgroundColor="#607D8B" label="Join Room" onTouchTap={() => {this.handleOpen(false)}}/>
               </MuiThemeProvider>
             </div>
           </Col>
@@ -183,18 +183,14 @@ componentWillUnmount() {
     return (
       <div className="container">
         {content}
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+        <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
            <Dialog
-<<<<<<< HEAD
-           title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join a Room'.toUpperCase()}
-=======
            title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join A Room'.toUpperCase()}
->>>>>>> 1c9d2c8619c255847f99a2b3ee6c7731f066a657
            actions={actions}
            modal={false}
            open={this.state.open}>
            {this.state.createDialog ? "Create a room to share music with friends!" : "Join a pre-existing friends room!"} <br/>
-           {!this.state.createDialog && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+           {!this.state.createDialog && <MuiThemeProvider muiTheme={getMuiTheme(Theme)}>
               <form onSubmit={this.handleAction}>
                 <Col s={12} className="input-field">
                   <TextField
