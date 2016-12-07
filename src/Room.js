@@ -10,7 +10,7 @@ import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import {Link, hashHistory} from 'react-router';
 import SwipeableViews from 'react-swipeable-views';
 import Search from './Search';
-import SongList from './Queue';
+import SongList from './SongList';
 import RadioPlayer from './ReactPlayer';
 
 //Room that will host all the functionality of our app. Need tabs for queue, history, and now playing

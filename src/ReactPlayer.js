@@ -22,6 +22,8 @@ class RadioPlayer extends React.Component {
 
   componentDidMount() {
 
+    console.log(this.props.room);
+
     firebase.auth().onAuthStateChanged((user) =>  {
       if(user) {
         this.setState({user:user});
@@ -51,6 +53,8 @@ class RadioPlayer extends React.Component {
   componentWillUnmount() {
     firebase.database().ref('users').off();
     firebase.database().ref('channels').off();
+    localStorage.removeItem('tempUrl');
+    localStorage.setItem('updated', JSON.stringify(false));
   }
 
   //handles the playing and pausing of the video for the whole room. only admin should have control over thi
@@ -122,7 +126,6 @@ class RadioPlayer extends React.Component {
     }
     nowPlayingRef.set(newNowPlaying);
     roomRef.child("queue").set(newQueue);
-    // this.setState({nowPlaying:null});
   };
 
   //for now, resets the queue
@@ -162,12 +165,6 @@ class RadioPlayer extends React.Component {
     queueRef.set(reset);
 
   };
-
-  // handleLoopClick = () => {
-  //   let toggleLooping = !this.state.isLooping;
-  //   //TODO update firebase instead of state here
-  //   this.setState({isLooping:toggleLooping});
-  // };
 
   //updates the state and firebase with each 'onProgress' call made by the react-player to make sure any joining users are up to date with the player
   onProgress = state => {
