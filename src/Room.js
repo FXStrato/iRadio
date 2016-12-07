@@ -84,7 +84,7 @@ class Room extends Component {
                   <h1 className="center-align flow-text">Now Playing</h1>
                 </Col>
                 <Col s={12}>
-                  <RadioPlayer room={this.props.params.roomID} />
+                  <RadioPlayer room={this.props.params.roomID} isOwner={this.state.isOwner} />
                 </Col>
               </Row>
             </div>
@@ -111,7 +111,7 @@ class Room extends Component {
               <Row>
                 <Col s={12}>
                   <h1 className="flow-text center-align">History</h1>
-                    <SongList room={this.props.params.roomID} user={this.state.userID} listType="history"/>
+                    <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="history"/>
                 </Col>
               </Row>
             </div>

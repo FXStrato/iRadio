@@ -22,8 +22,6 @@ class RadioPlayer extends React.Component {
 
   componentDidMount() {
 
-    console.log(this.props.room);
-
     firebase.auth().onAuthStateChanged((user) =>  {
       if(user) {
         this.setState({user:user});
@@ -79,10 +77,11 @@ class RadioPlayer extends React.Component {
       url: this.state.nowPlaying.url,
       baseUrl: this.state.nowPlaying.url,
       duration: this.state.nowPlaying.duration,
-      formattedDuration: this.state.nowPlaying.formattedDuration,
+      formatduration: this.state.nowPlaying.formatduration,
       title: this.state.nowPlaying.title,
       thumbnail: this.state.nowPlaying.thumbnail,
       channel: this.state.nowPlaying.channel,
+      insertTime: this.state.nowPlaying.insertTime
     };
     historyRef.push(oldTrack);
 
@@ -116,7 +115,8 @@ class RadioPlayer extends React.Component {
         url: newTrack.url,
         baseUrl: newTrack.url,
         duration: newTrack.duration,
-        formattedDuration: newTrack.formattedDuration,
+        formatduration: newTrack.formatduration,
+        insertTime: newTrack.insertTime,
         title: newTrack.title,
         thumbnail: newTrack.thumbnail,
         channel: newTrack.channel,
@@ -266,6 +266,7 @@ class RadioPlayer extends React.Component {
       <div className="row">
         <div className="col s12">
           <PlaybackControls
+            isOwner={this.props.isOwner}
             isPlaying={isPlaying}
             playPauseCallback={this.handlePlayPauseClick}
             forwardCallback={this.handleForwardClick}
@@ -312,28 +313,32 @@ class PlaybackControls extends React.Component {
   render() {
     return (
       <div className="row">
-        <div className="col s8 offset-s2">
-          <BottomNavigation style={{backgroundColor: '#212121'}}>
-            <BottomNavigationItem
-              label={!this.props.isPlaying ? "Play" : "Pause"}
-              icon={!this.props.isPlaying ? <PlayIcon/> : <PauseIcon/>}
-              onTouchTap={this.props.playPauseCallback}
+        {this.props.isOwner &&
+          <div>
+            <div className="col s8 offset-s2">
+              <BottomNavigation style={{backgroundColor: '#212121'}}>
+                <BottomNavigationItem
+                  label={!this.props.isPlaying ? "Play" : "Pause"}
+                  icon={!this.props.isPlaying ? <PlayIcon/> : <PauseIcon/>}
+                  onTouchTap={this.props.playPauseCallback}
+                />
+                <BottomNavigationItem
+                  label="Forward"
+                  icon={<ForwardIcon/>}
+                  onTouchTap={this.props.forwardCallback}
+                />
+              </BottomNavigation>
+            </div>
+          </div>
+          }
+          <div className="col s2 right">
+            <Slider
+              defaultValue={0.75}
+              axis={'y'}
+              style={{height: '100px', marginTop: '-55px'}}
+              onChange={this.props.volumeCallback}
             />
-            <BottomNavigationItem
-              label="Forward"
-              icon={<ForwardIcon/>}
-              onTouchTap={this.props.forwardCallback}
-            />
-          </BottomNavigation>
-        </div>
-        <div className="col s2">
-          <Slider
-            defaultValue={0.75}
-            axis={'y'}
-            style={{height: '100px', marginTop: '-55px'}}
-            onChange={this.props.volumeCallback}
-          />
-        </div>
+          </div>
       </div>
     );
   }

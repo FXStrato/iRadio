@@ -74,6 +74,7 @@ class Search extends Component {
   //Upon submitting request, search youtube, and return search results.
   onNewRequest(searchTerm) {
     this.setState({finished: false});
+    this.setState({durations: []});
     document.querySelector('#list-progress').style.display = 'inline-block';
     const
       self   = this,
@@ -149,11 +150,12 @@ class Search extends Component {
     let roomRef = firebase.database().ref('channels/' + this.props.room + '/queue');
     let item = {
       duration: this.convertToSeconds(song.duration),
-      formattedDuration: song.duration,
+      formatduration: song.duration,
       title: song.title,
       url: song.url,
       channel: song.channel,
-      thumbnail: song.thumbnail
+      thumbnail: song.thumbnail,
+      insertTime: firebase.database.ServerValue.TIMESTAMP
     }
     roomRef.push(item).off();
     this.setState({open: false});
