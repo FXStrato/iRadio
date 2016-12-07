@@ -137,7 +137,7 @@ componentWillUnmount() {
           <Col s={12} className="center-align">
             <h1>Let The Music Flow</h1>
             <div className="flow-text">
-              Host your own room and share your music, or find a friends to join!
+              Host your own room and share your music, or find friends to join!
             </div>
           </Col>
         </Row>
