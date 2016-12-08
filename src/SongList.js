@@ -119,7 +119,7 @@ class SongList extends React.Component {
         {this.state.queue.length < 1 &&
         <div className="center-align">Nothing In {isQueue ? 'Queue' : 'History'}</div>
         }
-        {this.state.queue.length >= 2 &&
+        {this.state.queue.length >= 2 && this.props.isOwner && 
           <Col s={12}>
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
               <FlatButton style={{float: 'right'}} backgroundColor={'#C2185B'} label="Delete All" onTouchTap={this.handleDeleteOpen}/>
