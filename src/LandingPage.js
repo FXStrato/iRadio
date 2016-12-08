@@ -116,7 +116,7 @@ componentWillUnmount() {
         //True, means the room exists
         //Edge case of owner joining own room through join room dialog
         if(this.state.roomName === this.state.userHandle) {
-          this.handleCreateRoom();
+          this.handleJoinOwnRoom();
         } else {
           let isOwnerRef = firebase.database().ref('/channels/' + this.state.roomName + '/ownerInRoom').once('value').then(snapshot => {
             if(snapshot.val()) {
