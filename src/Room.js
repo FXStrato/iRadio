@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {Tabs, Tab} from 'material-ui';
+import {Tabs, Tab, RaisedButton} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -12,6 +12,26 @@ import Search from './Search';
 import SongList from './SongList';
 import RadioPlayer from './ReactPlayer';
 
+const isMobile = {
+  Android: function() {
+      return navigator.userAgent.match(/Android/i);
+  },
+  BlackBerry: function() {
+      return navigator.userAgent.match(/BlackBerry/i);
+  },
+  iOS: function() {
+      return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+  },
+  Opera: function() {
+      return navigator.userAgent.match(/Opera Mini/i);
+  },
+  Windows: function() {
+      return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+  },
+  any: function() {
+      return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+  }
+};
 
 //Room that will host all the functionality of our app. Need tabs for queue, history, and now playing
 class Room extends Component {
@@ -26,31 +46,19 @@ class Room extends Component {
   }
 
   componentWillUnmount = () => {
+    //TODO: This needs to be made so that if the owner is one the one leaving, it sets ownerInRoom to false, and then shows a dialog and makes everyone else leave.
+    let temp = firebase.database().ref('channels/' + this.props.params.roomID + '/ownerInRoom');
+    temp.set(false)
+    temp.off();
     this.auth();
   }
 
   componentDidMount = () => {
-    const isMobile = {
-      Android: function() {
-          return navigator.userAgent.match(/Android/i);
-      },
-      BlackBerry: function() {
-          return navigator.userAgent.match(/BlackBerry/i);
-      },
-      iOS: function() {
-          return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-      },
-      Opera: function() {
-          return navigator.userAgent.match(/Opera Mini/i);
-      },
-      Windows: function() {
-          return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
-      },
-      any: function() {
-          return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
-      }
-    };
-    if(isMobile.any()) this.setState({isMobile: true})
+    //Set listener so that if owner leaves, dialog shows up that will cause everyone else to leave the room.
+    this.ownerRef = firebase.database().ref('channels/' + this.props.params.roomID + '/ownerInRoom').once('value').then(snapshot => {
+      console.log(snapshot.val()); //IF this is false, means owner is not in room
+    })
+
     this.setState({roomID: this.props.params.roomID})
     /* Add a listener and callback for authentication events */
     this.auth = firebase.auth().onAuthStateChanged(user => {
@@ -59,7 +67,13 @@ class Room extends Component {
         this.setState({userEmail:user.email})
         firebase.database().ref('users/' + user.uid).once('value').then(snapshot=> {
           if(snapshot.val()) {
-            if(snapshot.val().handle === this.props.params.roomID) this.setState({isOwner: true});
+            if(snapshot.val().handle === this.props.params.roomID) {
+              //In here, set ownerInRoom to true in firebase.
+              this.setState({isOwner: true});
+              let temp = firebase.database().ref('channels/' + snapshot.val().handle + '/ownerInRoom');
+              temp.set(true);
+              temp.off();
+            }
             this.setState({userHandle: snapshot.val().handle})
           }
         });
@@ -93,7 +107,7 @@ class Room extends Component {
                   <Col s={12}>
                     <h1 className="center-align flow-text">Now Playing</h1>
                   </Col>
-                  {!this.state.isMobile ?
+                  {!isMobile.any() ?
                     <Col s={12}>
                     <RadioPlayer room={this.props.params.roomID} isOwner={this.state.isOwner} />
                   </Col> :
@@ -108,9 +122,9 @@ class Room extends Component {
                 <Row>
                   <Col s={12}>
                     <h1 className="flow-text center-align">Next Songs</h1>
+                    <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="queue"/>
                   </Col>
                 </Row>
-                <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="queue"/>
               </div>
             </Tab>
             <Tab label={<span className="tab-names">Search</span>} value={2} style={{backgroundColor: '#424242', color: '#fff'}}>

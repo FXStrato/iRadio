@@ -96,7 +96,8 @@ componentWillUnmount() {
       nowPlaying: {},
       queue: {},
       history: {},
-      owner: this.state.userHandle
+      owner: this.state.userHandle,
+      ownerInRoom: true
     })
     roomRef.off();
     this.auth();

@@ -21,6 +21,12 @@ class RadioPlayer extends React.Component {
   }
 
   componentWillUnmount() {
+    //If person leaving is owner, pause everything.
+    let temp = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
+    let nowPlaying = this.state.nowPlaying;
+    nowPlaying.isPlaying = false;
+    temp.set(nowPlaying);
+    temp.off();
     this.auth();
     this.queueRef.off();
     this.nowPlayingRef.off();
@@ -58,7 +64,6 @@ class RadioPlayer extends React.Component {
 
   //handles the playing and pausing of the video for the whole room. only admin should have control over thi
   handlePlayPauseClick = () => {
-    //TODO toggle the classNames so that 'fa fa-pause' is the new classname
     var thisState = this.state.nowPlaying;
     thisState.isPlaying = !this.state.nowPlaying.isPlaying;
     var nowPlayingRef = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
@@ -87,47 +92,49 @@ class RadioPlayer extends React.Component {
     historyRef.push(oldTrack);
 
     //get the object at the front of the queue
-
-    var newTrack = null;
-    queueRef.orderByKey().limitToFirst(1)
-      .once("value", (snapshot) => {
-        var newTrackContainer = snapshot.val();
-        if(newTrackContainer) {
-          for (var track in newTrackContainer) {
-            if (newTrackContainer.hasOwnProperty(track)) {
-              newTrack = newTrackContainer[track];
-              newTrack.key = track;
+    //This is where it pulls from queue. Only do this if the person is owner.
+    if(this.props.isOwner) {
+      var newTrack = null;
+      queueRef.orderByKey().limitToFirst(1)
+        .once("value", (snapshot) => {
+          var newTrackContainer = snapshot.val();
+          if(newTrackContainer) {
+            for (var track in newTrackContainer) {
+              if (newTrackContainer.hasOwnProperty(track)) {
+                newTrack = newTrackContainer[track];
+                newTrack.key = track;
+              }
             }
           }
-        }
-      });
-    if(newTrack) {
-      firebase.database().ref(refPath + "/queue/" + newTrack.key).remove();
-    }
-    //removes the song that was at the front of the queue
-    var newQueue = {};
-    queueRef.once("value", (snapshot) => {
-      newQueue = snapshot.val();
-    });
-    //update the new now playing object entry
-    var newNowPlaying = null;
-    if(newTrack) {
-      newNowPlaying = {
-        url: newTrack.url,
-        baseUrl: newTrack.url,
-        duration: newTrack.duration,
-        formatduration: newTrack.formatduration,
-        insertTime: newTrack.insertTime,
-        title: newTrack.title,
-        thumbnail: newTrack.thumbnail,
-        channel: newTrack.channel,
-        progress: 0,
-        isPlaying: true
+        });
+      if(newTrack) {
+        firebase.database().ref(refPath + "/queue/" + newTrack.key).remove();
       }
+      //removes the song that was at the front of the queue
+      var newQueue = {};
+      queueRef.once("value", (snapshot) => {
+        newQueue = snapshot.val();
+      });
+      //update the new now playing object entry
+      var newNowPlaying = null;
+      if(newTrack) {
+        newNowPlaying = {
+          url: newTrack.url,
+          baseUrl: newTrack.url,
+          duration: newTrack.duration,
+          formatduration: newTrack.formatduration,
+          insertTime: newTrack.insertTime,
+          title: newTrack.title,
+          thumbnail: newTrack.thumbnail,
+          channel: newTrack.channel,
+          progress: 0,
+          isPlaying: true
+        }
+      }
+      nowPlayingRef.set(newNowPlaying);
+      roomRef.child("queue").set(newQueue);
     }
-    nowPlayingRef.set(newNowPlaying);
-    roomRef.child("queue").set(newQueue);
-  };
+  }
 
   //for now, resets the queue
   handleBackwardClick = () => {
@@ -320,12 +327,12 @@ class PlaybackControls extends React.Component {
               <BottomNavigation style={{backgroundColor: '#212121'}}>
                 <BottomNavigationItem
                   label={!this.props.isPlaying ? "Play" : "Pause"}
-                  icon={!this.props.isPlaying ? <PlayIcon/> : <PauseIcon/>}
+                  icon={!this.props.isPlaying ? <PlayIcon hoverColor="#039BE5"/> : <PauseIcon hoverColor="#039BE5"/>}
                   onTouchTap={this.props.playPauseCallback}
                 />
                 <BottomNavigationItem
                   label="Forward"
-                  icon={<ForwardIcon/>}
+                  icon={<ForwardIcon hoverColor="#039BE5"/>}
                   onTouchTap={this.props.forwardCallback}
                 />
               </BottomNavigation>

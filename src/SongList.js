@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import {Col} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -12,8 +13,11 @@ class SongList extends React.Component {
     queue: [],
     dialogKey: null,
     dialogTitle: null,
-    open: false
+    open: false,
+    deleteOpen: false
   }
+
+  //TODO: Given time, refactor to only use one dialog based on state
 
   componentWillUnmount = () => {
     this.queueRef.off();
@@ -35,6 +39,21 @@ class SongList extends React.Component {
       }
 
     })
+  }
+
+  handleDeleteOpen = () => {
+    this.setState({deleteOpen: true});
+  }
+
+  handleAllDelete = () => {
+    let songRef = firebase.database().ref('channels/' + this.props.room + '/' + this.props.listType);
+    songRef.set(null);
+    songRef.off();
+    this.setState({deleteOpen: false});
+  }
+
+  handleDeleteClose = () => {
+    this.setState({deleteOpen: false});
   }
 
   handleOpen = (key, title) => {
@@ -85,25 +104,56 @@ class SongList extends React.Component {
       />
     ];
 
+    const deleteActions = [
+      <FlatButton
+          label="Cancel"
+          onTouchTap={this.handleDeleteClose}
+      />,
+      <FlatButton
+          label={isQueue ? 'Remove All Songs From Queue' : 'Remove All Songs From History'}
+          onTouchTap={this.handleAllDelete}
+      />
+    ];
+
   return (
       <div>
         {this.state.queue.length < 1 &&
         <div className="center-align">Nothing In {isQueue ? 'Queue' : 'History'}</div>
         }
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-        <List>
-          {songList}
-        </List>
-        </MuiThemeProvider>
+        {this.state.queue.length >= 2 &&
+          <Col s={12}>
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+              <FlatButton style={{float: 'right'}} backgroundColor={'#C2185B'} label="Delete All" onTouchTap={this.handleDeleteOpen}/>
+            </MuiThemeProvider>
+          </Col>
+        }
+        <Col s={12}>
+          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+          <List>
+            {songList}
+          </List>
+          </MuiThemeProvider>
+        </Col>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
            <Dialog
            title={isQueue ? 'Deleting Song From Queue'.toUpperCase() : 'Deleting Song From History'.toUpperCase()}
            actions={actions}
            modal={false}
-           open={this.state.open}>
+           open={this.state.open}
+           onRequestClose={this.handleClose}>
            Are you sure you wish to remove {this.state.dialogTitle} from {isQueue ? 'queue' : 'history'}?
            </Dialog>
          </MuiThemeProvider>
+         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+            <Dialog
+            title={isQueue ? 'Deleting All From Queue'.toUpperCase() : 'Deleting Song All History'.toUpperCase()}
+            actions={deleteActions}
+            modal={false}
+            open={this.state.deleteOpen}
+            onRequestClose={this.handleDeleteClose}>
+            Are you sure you wish to remove all songs from {isQueue ? 'queue' : 'history'}?
+            </Dialog>
+          </MuiThemeProvider>
       </div>
     );
   }
