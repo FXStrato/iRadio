@@ -22,6 +22,7 @@ class LandingPage extends React.Component {
     userID: 'init',
     userHandle: '',
     roomMade: null,
+    deleteOpen: false
   }
 
   componentDidMount() {
@@ -85,7 +86,10 @@ componentWillUnmount() {
   }
 
   handleJoinOwnRoom = () => {
-    //Get user handle, and join the room
+    //Get user handle, and join the room, assigning ownerInRoom to true first
+    let ownerRef = firebase.database().ref('/channels/' + this.state.userHandle + '/ownerInRoom');
+    ownerRef.set(true);
+    ownerRef.off();
     hashHistory.push('room/' + this.state.userHandle);
   }
 
@@ -96,7 +100,8 @@ componentWillUnmount() {
       nowPlaying: {},
       queue: {},
       history: {},
-      owner: this.state.userHandle
+      owner: this.state.userHandle,
+      ownerInRoom: true
     })
     roomRef.off();
     this.auth();
@@ -109,11 +114,39 @@ componentWillUnmount() {
     let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
       if(snapshot.val()) {
         //True, means the room exists
-        hashHistory.push('room/' + this.state.roomName);
+        //Edge case of owner joining own room through join room dialog
+        if(this.state.roomName === this.state.userHandle) {
+          this.handleJoinOwnRoom();
+        } else {
+          let isOwnerRef = firebase.database().ref('/channels/' + this.state.roomName + '/ownerInRoom').once('value').then(snapshot => {
+            if(snapshot.val()) {
+              hashHistory.push('room/' + this.state.roomName);
+            } else {
+              this.setState({errorText: 'Room Owner is not currently in room'});
+            }
+          })
+        }
       } else {
         this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
       }
     });
+  }
+
+  handleDeleteOpen = () => {
+    this.setState({deleteOpen: true});
+  }
+
+  handleDelete = () => {
+    let songRef = firebase.database().ref('channels/' + this.state.userHandle);
+    songRef.set(null).then(() => {
+      this.setState({deleteOpen: false});
+      this.setState({roomMade: false});
+    });
+    songRef.off();
+  }
+
+  handleDeleteClose = () => {
+    this.setState({deleteOpen: false});
   }
 
   render() {
@@ -124,9 +157,22 @@ componentWillUnmount() {
         onTouchTap={this.handleClose}
     />,
     <FlatButton
+        type="submit"
         label={this.state.createDialog ? "Create Room" : "Join Room"}
         onTouchTap={this.state.createDialog ? this.handleCreateRoom : this.handleAction}
-    />]
+    />
+    ];
+
+    const deleteActions = [
+      <FlatButton
+          label="Cancel"
+          onTouchTap={this.handleDeleteClose}
+      />,
+      <FlatButton
+          label={'Delete Room'}
+          onTouchTap={this.handleDelete}
+      />
+    ];
 
     let content = null;
     if(firebase.auth().currentUser) {
@@ -153,6 +199,16 @@ componentWillUnmount() {
             </MuiThemeProvider>
           </Col>
         </Row>
+        {this.state.roomMade &&
+          <Row>
+            <br/>
+            <Col s={12} className="center-align">
+              <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <RaisedButton labelStyle={{color:'#fff'}} backgroundColor='#F50057' label="Delete Room" onTouchTap={this.handleDeleteOpen}/>
+              </MuiThemeProvider>
+            </Col>
+          </Row>
+        }
       </div>
     } else if(this.state.userID !== 'init') {
       content =  <div>
@@ -188,22 +244,34 @@ componentWillUnmount() {
            title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join A Room'.toUpperCase()}
            actions={actions}
            modal={false}
-           open={this.state.open}>
+           open={this.state.open}
+           autoScrollBodyContent={!this.state.createDialog}>
            {this.state.createDialog ? "Create a room to share music with friends!" : "Join a pre-existing friends room!"} <br/>
-           {!this.state.createDialog && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+           {!this.state.createDialog &&
               <form onSubmit={this.handleAction}>
                 <Col s={12} className="input-field">
                   <TextField
+                    type="text"
                     floatingLabelText="Room ID"
-                    id='joinroom-input'
                     onChange={this.handleChange}
                     errorText={this.state.errorText}
                   />
                 </Col>
               </form>
-              </MuiThemeProvider>}
+              }
            </Dialog>
          </MuiThemeProvider>
+         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+            <Dialog
+            title={'Deleting Room'}
+            actions={deleteActions}
+            modal={false}
+            open={this.state.deleteOpen}
+            onRequestClose={this.handleDeleteClose}
+            >
+            Are you sure you wish to completely remove your room? You can remake at any time, but you will lose your current queue and history.
+            </Dialog>
+          </MuiThemeProvider>
       </div>
     );
   }

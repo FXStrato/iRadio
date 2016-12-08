@@ -1,5 +1,7 @@
 {
   "name": "iRadio",
+  "author": "Jeff Zhong",
+  "homepage": "https://fxstrato.github.io/projects/iRadio/build",
   "version": "0.1.0",
   "private": true,
   "devDependencies": {

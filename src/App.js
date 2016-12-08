@@ -21,9 +21,34 @@ class App extends Component {
       userEmail: null,
       userID: null,
       userHandle: '',
-      open: false
+      open: false,
+      dialogOpen: false,
+      dialogText: '',
+      dialogTitle: ''
     };
   }
+
+  componentDidMount() {
+   /* Add a listener and callback for authentication events */
+   firebase.auth().onAuthStateChanged(user => {
+     if(user) {
+       console.log('Auth state changed: logged in as', user.email);
+       this.setState({userID:user.uid});
+       this.setState({userEmail:user.email})
+       firebase.database().ref('users/' + user.uid).once('value').then(snapshot=> {
+         if(snapshot.val()) {
+           this.setState({userHandle: snapshot.val().handle})
+         }
+       });
+     }
+     else{
+       console.log('Auth state changed: logged out');
+       this.setState({userID: null}); //null out the saved state
+       this.setState({userEmail: null})
+       this.setState({userHandle: ''});
+     }
+   })
+ }
 
   handleTouchTap = (event) => {
     // This prevents ghost click.
@@ -56,29 +81,27 @@ class App extends Component {
     }
   }
 
-  componentDidMount() {
-   /* Add a listener and callback for authentication events */
-   firebase.auth().onAuthStateChanged(user => {
-     if(user) {
-       console.log('Auth state changed: logged in as', user.email);
-       this.setState({userID:user.uid});
-       this.setState({userEmail:user.email})
-       firebase.database().ref('users/' + user.uid).once('value').then(snapshot=> {
-         if(snapshot.val()) {
-           this.setState({userHandle: snapshot.val().handle})
-         }
-       });
-     }
-     else{
-       console.log('Auth state changed: logged out');
-       this.setState({userID: null}); //null out the saved state
-       this.setState({userEmail: null})
-       this.setState({userHandle: ''});
-     }
-   })
- }
+  handleDialogClose = () => {
+    this.setState({dialogOpen: false});
+  }
+
+  handleDialogOpen = () => {
+    this.setState({dialogOpen: true});
+  }
 
   render() {
+    let dialogText = '';
+    let dialogTitle = '';
+    if(hashHistory.getCurrentLocation().pathname.indexOf('/room') !== -1) {
+
+    }
+
+    const actions = [
+      <FlatButton
+          label="Ok"
+          onTouchTap={this.handleDialogClose}
+      />
+    ];
 
     return (
       <div>
@@ -87,7 +110,7 @@ class App extends Component {
             <Paper zDepth={1}>
                 <Toolbar style={{backgroundColor: '#262626',}}>
                   <ToolbarGroup onClick={this.goHome}>
-                    <FlatButton style={{height: 50, paddingTop: '5px', paddingRight: 10}}>
+                    <FlatButton style={{height: 50, paddingTop: '5px', paddingRight: 10, marginLeft: '-15px'}}>
                       <img style={{float: 'left', width: '50px', height: '50px'}} src={mainIcon} alt="Network by Dmitry Mirolyubov from the Noun Project"/>
                       <span className="flow-text">iRadio</span>
                     </FlatButton>
@@ -98,6 +121,7 @@ class App extends Component {
                       anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                       targetOrigin={{horizontal: 'right', vertical: 'top'}}
                     >
+                      <MenuItem onTouchTap={this.handleDialogOpen} primaryText="Room ID" />
                       <MenuItem onTouchTap={this.signOut} primaryText="Sign out" />
                     </IconMenu>
                   </ToolbarGroup>
@@ -107,6 +131,17 @@ class App extends Component {
         </header>
         <main>
           {this.props.children}
+          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+            <Dialog
+              title={<div>Room ID: <span style={{color: "#03A9F4"}}>{this.state.userHandle}</span></div>}
+              actions={actions}
+              modal={false}
+              open={this.state.dialogOpen}
+              onRequestClose={this.handleDialogClose}>
+              Your user handle doubles as your room ID! This is your room ID: <span style={{color: "#03A9F4", fontSize: '1.5rem'}}>{this.state.userHandle}</span> <br/>
+              Once you create a room, share with your friends to let them join!
+            </Dialog>
+          </MuiThemeProvider>
         </main>
         <footer>
 

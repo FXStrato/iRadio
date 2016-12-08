@@ -72,7 +72,7 @@ class SignInForm extends React.Component{
               </div>
               <div className="input-field">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                  <RaisedButton label={!this.state.icon && 'Sign In'} icon={this.state.icon} primary={true} disabled={this.state.disabled} labelStyle={{color: '#fff'}} onTouchTap={this.signIn}/>
+                  <RaisedButton type="submit" label={!this.state.icon && 'Sign In'} icon={this.state.icon} primary={true} disabled={this.state.disabled} labelStyle={{color: '#fff'}} onTouchTap={this.signIn}/>
                 </MuiThemeProvider>
               </div>
             </form>
