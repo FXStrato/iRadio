@@ -22,11 +22,13 @@ class RadioPlayer extends React.Component {
 
   componentWillUnmount() {
     //If person leaving is owner, pause everything.
-    let temp = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
-    let nowPlaying = this.state.nowPlaying;
-    nowPlaying.isPlaying = false;
-    temp.set(nowPlaying);
-    temp.off();
+    if(this.props.isOwner && this.state.nowPlaying) {
+      let thisState = this.state.nowPlaying;
+      thisState.isPlaying = !this.state.nowPlaying.isPlaying;
+      let nowPlayingRef = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
+      nowPlayingRef.set(thisState);
+      nowPlayingRef.off();
+    }
     this.auth();
     this.queueRef.off();
     this.nowPlayingRef.off();

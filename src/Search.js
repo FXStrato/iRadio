@@ -6,7 +6,7 @@ import JSONP from 'jsonp';
 import YoutubeFinder from 'youtube-finder';
 import {Link, hashHistory} from 'react-router';
 import {Row, Col} from 'react-materialize';
-import {RaisedButton, FlatButton, Dialog, TextField, List, ListItem, AutoComplete, CircularProgress} from 'material-ui';
+import {RaisedButton, FlatButton, Dialog, TextField, List, ListItem, AutoComplete, CircularProgress, Avatar} from 'material-ui';
 import _ from 'lodash';
 import ytDurationFormat from 'youtube-duration-format';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -31,8 +31,14 @@ class Search extends Component {
       dialogText: '',
       finished: false,
       open: false,
-      song: {}
+      song: {},
+      all: []
     }
+  }
+
+
+  constructorWillUnmount = () => {
+    this.roomRef.off();
   }
 
   //Populating the auto complete list, searching google's query results.
@@ -88,33 +94,28 @@ class Search extends Component {
     this.YoutubeClient.search(params, function(error,results) {
       if(error) return console.log(error);
       self.setState({results: results.items});
-      self.getDurations(results.items);
+      self.getDurations(results.items, 0, []);
       self.setState({
         dataSource : []
       });
     });
   }
 
-  //Upon obtaining list of promises, calculate the durations for each song
-  getDurations = items => {
-    this.setState({durations: []});
-    //This currently only gives me promises
-    let temp = _.map(items, elem => {
-      return fetch('https://www.googleapis.com/youtube/v3/videos?id=' + elem.id.videoId + '&part=contentDetails&key=' + this.props.apiKey)
+  //Recursive call to ensure fetches are in the proper order. Slower... but no errors so far.
+  getDurations = (items, index, array) => {
+    if(index >= items.length) {
+      this.setState({durations: array});
+      this.setState({finished: true});
+      document.querySelector('#list-progress').style.display = 'none';
+      return array;
+    } else {
+      fetch('https://www.googleapis.com/youtube/v3/videos?id=' + items[index].id.videoId + '&part=contentDetails&key=' + this.props.apiKey)
       .then(res => {
-        return res.json();
-      }).catch(err => console.log(err))
-    })
-    for(let i = 0; i < temp.length; i++) {
-      temp[i].then(data => {
-        let duration = this.state.durations;
-        duration.push(ytDurationFormat(data.items[0].contentDetails.duration));
-        this.setState({durations: duration});
-        if(i === temp.length - 1) {
-          this.setState({finished: true})
-          document.querySelector('#list-progress').style.display = 'none';
-        }
-      });
+        res.json().then(data => {
+          array.push(ytDurationFormat(data.items[0].contentDetails.duration));
+          this.getDurations(items, index+=1, array);
+        })
+      })
     }
   }
 
@@ -126,10 +127,9 @@ class Search extends Component {
         <List>
           <ListItem
             disabled={true}
-            innerDivStyle={{padding: '0'}}
             key={'dialog-'+result.url}
-            leftAvatar={<img className="responsive-img" style={{position: 'none', marginRight: '10px', width: '210px'}} src={result.thumbnail} alt={result.url}/>}
-            primaryText={<div style={{paddingTop: '20px'}}>{result.title}</div>}
+            leftAvatar={<Avatar size={50} src={result.thumbnail}/>}
+            primaryText={result.title}
             secondaryText={result.channel + ' | ' + result.duration}
             secondaryTextLines={2}
           />
@@ -147,7 +147,7 @@ class Search extends Component {
   handleSubmit = () => {
     //Add song to firebase. Should be attached to add to queue button
     let song = this.state.song;
-    let roomRef = firebase.database().ref('channels/' + this.props.room + '/queue');
+    this.roomRef = firebase.database().ref('channels/' + this.props.room + '/queue');
     let item = {
       duration: this.convertToSeconds(song.duration),
       formatduration: song.duration,
@@ -157,9 +157,8 @@ class Search extends Component {
       thumbnail: song.thumbnail,
       insertTime: firebase.database.ServerValue.TIMESTAMP
     }
-    roomRef.push(item).off();
-    this.setState({open: false});
-    this.setState({inputValue: ''});
+    this.roomRef.push(item);
+    this.setState({open: false, inputValue: ''});
     this.props.callback(true);
   }
 
@@ -177,18 +176,17 @@ class Search extends Component {
 
   render() {
     let content = [];
-    if(this.state.finished) {
+    if(this.state.finished && this.state.durations.length === this.state.results.length) {
       let callback = this.props.callback;
       content = _.map(this.state.results, (elem, index) => {
         let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], channel:elem.snippet.channelTitle, thumbnail: elem.snippet.thumbnails.high.url};
         return <ListItem
           onTouchTap={() => this.handleOpen(temp)}
-          style={{overflow: 'hidden', backgroundColor: '#1F1F1F', border: '1px #373737 solid', paddingBottom: '10px'}}
-          innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
+          style={{backgroundColor: '#1F1F1F', border: '1px #373737 solid'}}
           key={elem.id.videoId}
-          leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginLeft: '10px', marginRight: '10px'}} src={elem.snippet.thumbnails.default.url} alt={elem.id.videoId}/>}
-          primaryText={<div style={{paddingTop: '20px'}}>{elem.snippet.title}</div>}
-          secondaryText={this.state.durations[index] ? elem.snippet.channelTitle + ' | ' + this.state.durations[index] : elem.snippet.channelTitle + ' | Loading...'}
+          leftAvatar={<Avatar size={50} src={elem.snippet.thumbnails.high.url}/>}
+          primaryText={<span style={{marginLeft: '10px'}}>{elem.snippet.title}</span>}
+          secondaryText={<span style={{marginLeft: '10px'}}>{this.state.durations[index] ? elem.snippet.channelTitle + ' | ' + this.state.durations[index] : elem.snippet.channelTitle + ' |  Loading...'}</span>}
           secondaryTextLines={2}
         />
       });

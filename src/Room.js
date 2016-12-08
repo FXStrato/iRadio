@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {Tabs, Tab, RaisedButton} from 'material-ui';
+import {Tabs, Tab, RaisedButton, Dialog, FlatButton} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -42,23 +42,22 @@ class Room extends Component {
     userEmail: null,
     userHandle: '',
     isOwner: false,
-    isMobile: false
+    isMobile: false,
+    open: false
   }
 
   componentWillUnmount = () => {
-    //TODO: This needs to be made so that if the owner is one the one leaving, it sets ownerInRoom to false, and then shows a dialog and makes everyone else leave.
-    let temp = firebase.database().ref('channels/' + this.props.params.roomID + '/ownerInRoom');
-    temp.set(false)
-    temp.off();
+    //If owner leaves, set ownerInRoom to gone.
+    if(this.state.isOwner) {
+      let temp = firebase.database().ref('channels/' + this.props.params.roomID + '/ownerInRoom');
+      temp.set(false);
+      temp.off();
+    }
     this.auth();
+    this.ownerRef.off();
   }
 
   componentDidMount = () => {
-    //Set listener so that if owner leaves, dialog shows up that will cause everyone else to leave the room.
-    this.ownerRef = firebase.database().ref('channels/' + this.props.params.roomID + '/ownerInRoom').once('value').then(snapshot => {
-      console.log(snapshot.val()); //IF this is false, means owner is not in room
-    })
-
     this.setState({roomID: this.props.params.roomID})
     /* Add a listener and callback for authentication events */
     this.auth = firebase.auth().onAuthStateChanged(user => {
@@ -83,6 +82,20 @@ class Room extends Component {
         this.setState({userEmail: null})
       }
     })
+    //Set listener so that if owner leaves, dialog shows up that will cause everyone else to leave the room.
+    this.ownerRef = firebase.database().ref('channels/' + this.props.params.roomID + '/ownerInRoom');
+    this.checkRef = firebase.database().ref('channels/' + this.props.params.roomID + '/ownerInRoom').once('value').then(snapshot => {
+      if(snapshot.val()) {
+        //Owner is in room. Make a listener
+        this.ownerRef.on('value', snapshot => {
+          if(!snapshot.val()) {
+            this.setState({open: true});
+          }
+        })
+      } else {
+        this.setState({open: true});
+      }
+    })
   }
 
   handleChange = value => {
@@ -92,10 +105,25 @@ class Room extends Component {
   searchCallback = result => {
     if(result) {
       this.setState({value: 1});
+    } else {
+      this.setState({value: 0});
     }
   }
 
+  handleSubmit = () => {
+    hashHistory.push('/');
+  }
+
   render() {
+
+    const actions = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        onTouchTap={this.handleSubmit}
+      />
+    ];
+
     return (
       <div>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
@@ -151,6 +179,16 @@ class Room extends Component {
               </div>
             </Tab>
           </Tabs>
+        </MuiThemeProvider>
+        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+          <Dialog
+            title={'Room Owner Has Left'.toUpperCase()}
+            actions={actions}
+            modal={true}
+            open={this.state.open}
+            onRequestClose={this.handleClose}>
+            The room owner has left the room; Moving everybody out.
+          </Dialog>
         </MuiThemeProvider>
       </div>
     );

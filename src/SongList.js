@@ -4,7 +4,7 @@ import {Col} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-import {List, ListItem, Dialog, FlatButton} from 'material-ui';
+import {List, ListItem, Dialog, FlatButton, Avatar} from 'material-ui';
 import firebase from 'firebase';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
@@ -21,6 +21,7 @@ class SongList extends React.Component {
 
   componentWillUnmount = () => {
     this.queueRef.off();
+    this.songRef.off();
   }
 
   componentDidMount = () => {
@@ -45,10 +46,10 @@ class SongList extends React.Component {
     this.setState({deleteOpen: true});
   }
 
+  //Need .then .catch check if error occurs
   handleAllDelete = () => {
-    let songRef = firebase.database().ref('channels/' + this.props.room + '/' + this.props.listType);
-    songRef.set(null);
-    songRef.off();
+    this.songRef = firebase.database().ref('channels/' + this.props.room + '/' + this.props.listType);
+    this.songRef.set(null);
     this.setState({deleteOpen: false});
   }
 
@@ -66,11 +67,10 @@ class SongList extends React.Component {
     this.setState({open: false});
   }
 
-  //This function might be causing problems. Not sure though. It still deletes, but queue isn't updating.
+  //Should have a .then .catch check if delete throws an error somehow
   handleDelete = () => {
-    let songRef = firebase.database().ref('channels/' + this.props.room + '/' + this.props.listType + '/' + this.state.dialogKey);
-    songRef.remove();
-    songRef.off();
+    this.songRef = firebase.database().ref('channels/' + this.props.room + '/' + this.props.listType + '/' + this.state.dialogKey);
+    this.songRef.set(null);
     this.setState({open: false});
   }
 
@@ -82,13 +82,12 @@ class SongList extends React.Component {
     let songList = _.map(this.state.queue, (song, index) => {
       var content = '';
       content = <ListItem
-        style={{overflow: 'hidden', backgroundColor: '#1F1F1F', border: '1px #373737 solid', paddingBottom: '10px'}}
-        innerDivStyle={{padding: '0', margin: '10px 10px 0px 0px',}}
+        style={{backgroundColor: '#1F1F1F', border: '1px #373737 solid', paddingBottom: '10px'}}
         key={song.key}
-        leftAvatar={<img className="responsive-img" style={{position: 'none', float: 'left', marginLeft: '10px', marginRight: '10px', width: '120px'}} src={song.thumbnail} alt={song.title}/>}
-        rightIcon={this.props.isOwner ? <DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />: <div></div>}
-        primaryText={<div style={{paddingTop: '20px', paddingRight: '50px', color:'white'}}>{song.title}</div>}
-        secondaryText={<div style={{color:'white'}}>{song.channel} | {song.formatduration}</div>}
+        leftAvatar={<Avatar size={50} src={song.thumbnail}/>}
+        rightIcon={this.props.isOwner ? <DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />: <span></span>}
+        primaryText={song.title}
+        secondaryText={song.channel + ' | ' + song.formatduration}
       />;
       return content;
     });

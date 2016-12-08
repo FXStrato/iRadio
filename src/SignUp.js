@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: "off"*/ //don't show warnings for unused
 import React from 'react';
-import {TextField, RaisedButton} from 'material-ui';
+import {TextField, RaisedButton, CircularProgress} from 'material-ui';
 import {Row, Col} from 'react-materialize';
 //import {Link} from 'react-router';
 import firebase from 'firebase';
@@ -26,7 +26,9 @@ class SignUpForm extends React.Component {
       emailvalidate: false,
       passwordvalidate: false,
       matchvalidate: false,
-      uservalidate: false
+      uservalidate: false,
+      icon: undefined,
+      errorText: ''
     };
 
     //function binding
@@ -41,21 +43,19 @@ class SignUpForm extends React.Component {
     var changes = {}; //object to hold changes
     changes[field] = value; //change this field
     this.setState(changes); //update state
+    this.setState({errorText: ''});
   }
 
   //handle signUp button
   signUp(event) {
     event.preventDefault(); //don't submit
-    if(!this.state.email) {
-      alert('Please fill out the form first!');
-    } else {
-      this.signUpCallback(this.state.email, this.state.user, this.state.password);
-    }
+    this.signUpCallback(this.state.email, this.state.user, this.state.password);
   }
 
   signUpCallback(email, handle, password) {
     /* Create a new user and save their information */
-
+    this.setState({disabled: true});
+    this.setState({icon: <CircularProgress size={26}/>});
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(function(firebaseUser) {
         //include information (for app-level content)
@@ -75,7 +75,11 @@ class SignUpForm extends React.Component {
         var userPromise = userRef.set(userData); //update entry in JOITC, return promise for chaining
         //return Promise.all(profilePromise, userPromise); //do both at once!
       })
-
+      .catch(err => {
+        this.setState({disabled: false});
+        this.setState({icon: undefined});
+        this.setState({errorText: err.message});
+      })
   }
 
 
@@ -186,6 +190,7 @@ class SignUpForm extends React.Component {
         <Row>
           <Col s={12}>
             <h1>Sign Up</h1>
+            <div style={{color: '#E53935'}}>{this.state.errorText}</div>
             <form role="form">
               <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
@@ -208,7 +213,7 @@ class SignUpForm extends React.Component {
                 </MuiThemeProvider>
               </div>
               <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-                <RaisedButton label="Sign Up" labelStyle={!buttonDisabled ? {color: '#fff'} : {}} disabled={buttonDisabled} primary={true} onTouchTap={(e) => {this.signUp(e)}}/>
+                <RaisedButton label="Sign Up" labelStyle={!buttonDisabled ? {color: '#fff'} : {}} icon={this.state.icon} disabled={buttonDisabled} primary={true} onTouchTap={(e) => {this.signUp(e)}}/>
               </MuiThemeProvider>
             </form>
           </Col>
