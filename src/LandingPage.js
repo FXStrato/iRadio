@@ -244,7 +244,8 @@ componentWillUnmount() {
            title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join A Room'.toUpperCase()}
            actions={actions}
            modal={false}
-           open={this.state.open}>
+           open={this.state.open}
+           autoScrollBodyContent={!this.state.createDialog}>
            {this.state.createDialog ? "Create a room to share music with friends!" : "Join a pre-existing friends room!"} <br/>
            {!this.state.createDialog &&
               <form onSubmit={this.handleAction}>
@@ -267,7 +268,7 @@ componentWillUnmount() {
             modal={false}
             open={this.state.deleteOpen}
             onRequestClose={this.handleDeleteClose}
-            autoScrollBodyContent={true}>
+            >
             Are you sure you wish to completely remove your room? You can remake at any time, but you will lose your current queue and history.
             </Dialog>
           </MuiThemeProvider>
