@@ -80,6 +80,10 @@ class App extends Component {
 
   render() {
 
+    if(hashHistory.getCurrentLocation().pathname.indexOf('/room') !== -1) {
+      console.log('We in room');
+    }
+
     return (
       <div>
         <header>

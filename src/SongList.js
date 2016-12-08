@@ -21,7 +21,7 @@ class SongList extends React.Component {
 
   componentWillUnmount = () => {
     this.queueRef.off();
-    this.songRef.off();
+    if(this.songRef) this.songRef.off();
   }
 
   componentDidMount = () => {
