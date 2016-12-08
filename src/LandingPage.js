@@ -114,13 +114,18 @@ componentWillUnmount() {
     let roomRef = firebase.database().ref('/channels/' + this.state.roomName).once('value').then(snapshot => {
       if(snapshot.val()) {
         //True, means the room exists
-        let isOwnerRef = firebase.database().ref('/channels/' + this.state.roomName + '/ownerInRoom').once('value').then(snapshot => {
-          if(snapshot.val()) {
-            hashHistory.push('room/' + this.state.roomName);
-          } else {
-            this.setState({errorText: 'Room Owner is not currently in room'});
-          }
-        })
+        //Edge case of owner joining own room through join room dialog
+        if(this.state.roomName === this.state.userHandle) {
+          this.handleCreateRoom();
+        } else {
+          let isOwnerRef = firebase.database().ref('/channels/' + this.state.roomName + '/ownerInRoom').once('value').then(snapshot => {
+            if(snapshot.val()) {
+              hashHistory.push('room/' + this.state.roomName);
+            } else {
+              this.setState({errorText: 'Room Owner is not currently in room'});
+            }
+          })
+        }
       } else {
         this.setState({errorText: 'Room "' + this.state.roomName + '" was not found'});
       }
@@ -241,17 +246,18 @@ componentWillUnmount() {
            modal={false}
            open={this.state.open}>
            {this.state.createDialog ? "Create a room to share music with friends!" : "Join a pre-existing friends room!"} <br/>
-           {!this.state.createDialog && <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+           {!this.state.createDialog &&
               <form onSubmit={this.handleAction}>
                 <Col s={12} className="input-field">
                   <TextField
+                    type="text"
                     floatingLabelText="Room ID"
                     onChange={this.handleChange}
                     errorText={this.state.errorText}
                   />
                 </Col>
               </form>
-              </MuiThemeProvider>}
+              }
            </Dialog>
          </MuiThemeProvider>
          <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
@@ -260,7 +266,8 @@ componentWillUnmount() {
             actions={deleteActions}
             modal={false}
             open={this.state.deleteOpen}
-            onRequestClose={this.handleDeleteClose}>
+            onRequestClose={this.handleDeleteClose}
+            autoScrollBodyContent={true}>
             Are you sure you wish to completely remove your room? You can remake at any time, but you will lose your current queue and history.
             </Dialog>
           </MuiThemeProvider>

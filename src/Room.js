@@ -43,8 +43,12 @@ class Room extends Component {
     userHandle: '',
     isOwner: false,
     isMobile: false,
-    open: false
+    open: false,
+    dialogText: '',
+    dialogTitle: ''
   }
+
+  //TODO: Instead of true or false for ownerInRoom, make it something else. Cause false also will return if it doesn't exist.
 
   componentWillUnmount = () => {
     //If owner leaves, set ownerInRoom to gone.
@@ -89,6 +93,7 @@ class Room extends Component {
         //Owner is in room. Make a listener
         this.ownerRef.on('value', snapshot => {
           if(!snapshot.val()) {
+            this.setState({dialogText: 'Owner has left the room. Moving everybody out.', dialogTitle: 'Room Owner Has Left'.toUpperCase()});
             this.setState({open: true});
           }
         })
@@ -182,12 +187,12 @@ class Room extends Component {
         </MuiThemeProvider>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
           <Dialog
-            title={'Room Owner Has Left'.toUpperCase()}
+            title={this.state.dialogTitle}
             actions={actions}
             modal={true}
             open={this.state.open}
             onRequestClose={this.handleClose}>
-            The room owner has left the room; Moving everybody out.
+            {this.state.dialogText}
           </Dialog>
         </MuiThemeProvider>
       </div>
