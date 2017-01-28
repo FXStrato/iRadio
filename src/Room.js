@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import firebase from 'firebase';
 import {Row, Col} from 'react-materialize';
-import {Tabs, Tab, RaisedButton, Dialog, FlatButton} from 'material-ui';
+import {Tabs, Tab, RaisedButton, Dialog, FlatButton, Snackbar} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -45,7 +45,9 @@ class Room extends Component {
     isMobile: false,
     open: false,
     dialogText: '',
-    dialogTitle: ''
+    dialogTitle: '',
+    snackbarOpen: false,
+    snackbarMessage: ''
   }
 
   //TODO: Instead of true or false for ownerInRoom, make it something else. Cause false also will return if it doesn't exist.
@@ -108,11 +110,17 @@ class Room extends Component {
   }
 
   searchCallback = result => {
-    if(result) {
-      this.setState({value: 1});
-    } else {
-      this.setState({value: 0});
-    }
+    this.setState({snackbarOpen: true, snackbarMessage: result + ' was added to queue'})
+    //Callback from search. Upon successful input, toast that the song was added
+    // if(result) {
+    //   this.setState({value: 1});
+    // } else {
+    //   this.setState({value: 0});
+    // }
+  }
+
+  handleSnackbarClose = () => {
+    this.setState({snackbarOpen: false})
   }
 
   handleSubmit = () => {
@@ -154,7 +162,7 @@ class Room extends Component {
               <div className="container">
                 <Row>
                   <Col s={12}>
-                    <h1 className="flow-text center-align">Next Songs</h1>
+                    <h1 className="flow-text center-align">Queue</h1>
                     <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="queue"/>
                   </Col>
                 </Row>
@@ -194,6 +202,15 @@ class Room extends Component {
             onRequestClose={this.handleClose}>
             {this.state.dialogText}
           </Dialog>
+        </MuiThemeProvider>
+        <MuiThemeProvider muiTheme={getMuiTheme()}>
+          <Snackbar
+            className="black white-text"
+            open={this.state.snackbarOpen}
+            message={this.state.snackbarMessage}
+            autoHideDuration={4000}
+            onRequestClose={this.handleSnackbarClose}
+          />
         </MuiThemeProvider>
       </div>
     );

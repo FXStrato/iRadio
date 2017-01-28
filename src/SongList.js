@@ -88,6 +88,7 @@ class SongList extends React.Component {
         rightIcon={this.props.isOwner ? <DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />: <span></span>}
         primaryText={song.title}
         secondaryText={song.channel + ' | ' + song.formatduration}
+        disabled={true}
       />;
       return content;
     });
@@ -119,7 +120,7 @@ class SongList extends React.Component {
         {this.state.queue.length < 1 &&
         <div className="center-align">Nothing In {isQueue ? 'Queue' : 'History'}</div>
         }
-        {this.state.queue.length >= 2 && this.props.isOwner && 
+        {this.state.queue.length >= 2 && this.props.isOwner &&
           <Col s={12}>
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
               <FlatButton style={{float: 'right'}} backgroundColor={'#C2185B'} label="Delete All" onTouchTap={this.handleDeleteOpen}/>

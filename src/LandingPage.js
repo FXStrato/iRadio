@@ -244,8 +244,7 @@ componentWillUnmount() {
            title={this.state.createDialog ? 'Create Your Room'.toUpperCase() : 'Join A Room'.toUpperCase()}
            actions={actions}
            modal={false}
-           open={this.state.open}
-           autoScrollBodyContent={!this.state.createDialog}>
+           open={this.state.open}>
            {this.state.createDialog ? "Create a room to share music with friends!" : "Join a pre-existing friends room!"} <br/>
            {!this.state.createDialog &&
               <form onSubmit={this.handleAction}>

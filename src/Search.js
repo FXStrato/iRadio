@@ -94,11 +94,30 @@ class Search extends Component {
     this.YoutubeClient.search(params, function(error,results) {
       if(error) return console.log(error);
       self.setState({results: results.items});
-      self.getDurations(results.items, 0, []);
+      // self.getDurations(results.items, 0, []);
+      self.getDurationsv3(results.items);
       self.setState({
         dataSource : []
       });
     });
+  }
+
+  getDurationsv3 = (items) => {
+    let idstring = items[0].id.videoId;
+    for(let i = 1; i < items.length; i++) {
+      idstring += ',' + items[i].id.videoId;
+    }
+    fetch('https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=' + idstring + '&key=' + this.props.apiKey)
+    .then(res => {
+      res.json().then(data => {
+        let endarray = [];
+        for(let i = 0; i < data.items.length; i++) {
+          endarray[i] = ytDurationFormat(data.items[i].contentDetails.duration);
+        }
+        this.setState({durations: endarray, finished: true});
+        document.querySelector('#list-progress').style.display = 'none';
+      });
+    })
   }
 
   //Recursive call to ensure fetches are in the proper order. Slower... but no errors so far.
@@ -144,9 +163,9 @@ class Search extends Component {
     this.setState({open: false});
   };
 
-  handleSubmit = () => {
+  handleSubmit = (result) => {
     //Add song to firebase. Should be attached to add to queue button
-    let song = this.state.song;
+    let song = result;
     this.roomRef = firebase.database().ref('channels/' + this.props.room + '/queue');
     let item = {
       duration: this.convertToSeconds(song.duration),
@@ -159,7 +178,7 @@ class Search extends Component {
     }
     this.roomRef.push(item);
     this.setState({open: false, inputValue: ''});
-    this.props.callback(true);
+    this.props.callback(song.title);
   }
 
   convertToSeconds = str => {
@@ -181,7 +200,8 @@ class Search extends Component {
       content = _.map(this.state.results, (elem, index) => {
         let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], channel:elem.snippet.channelTitle, thumbnail: elem.snippet.thumbnails.high.url};
         return <ListItem
-          onTouchTap={() => this.handleOpen(temp)}
+          // onTouchTap={() => this.handleOpen(temp)}
+          onTouchTap={() => this.handleSubmit(temp)}
           style={{backgroundColor: '#1F1F1F', border: '1px #373737 solid'}}
           key={elem.id.videoId}
           leftAvatar={<Avatar size={50} src={elem.snippet.thumbnails.high.url}/>}

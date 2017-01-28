@@ -269,24 +269,33 @@ class RadioPlayer extends React.Component {
 
     return (<div>
       <div className="row">
-
         {content}
         <div className="col s12 center-align">
           <h1 className="flow-text">{title}</h1>
         </div>
+        {this.state.nowPlaying !== null && !this.state.nowPlaying.isPlaying  ?
+          <div className="col s12 center-align red-text text-lighten-2">
+            Video is currently paused
+          </div>
+        :
+        <div className="col s12 center-align red-text text-lighten-2" style={{visibility: 'hidden'}}>
+          Video is currently paused
+        </div>}
       </div>
-      <div className="row">
-        <div className="col s12">
-          <PlaybackControls
-            isOwner={this.props.isOwner}
-            isPlaying={isPlaying}
-            playPauseCallback={this.handlePlayPauseClick}
-            forwardCallback={this.handleForwardClick}
-            backwardCallback={this.handleBackwardClick}
-            volumeCallback={this.handleVolumeChange}
-          />
+      {this.state.nowPlaying !== null &&
+        <div className="row">
+          <div className="col s12">
+            <PlaybackControls
+              isOwner={this.props.isOwner}
+              isPlaying={isPlaying}
+              playPauseCallback={this.handlePlayPauseClick}
+              forwardCallback={this.handleForwardClick}
+              backwardCallback={this.handleBackwardClick}
+              volumeCallback={this.handleVolumeChange}
+            />
+          </div>
         </div>
-      </div>
+      }
     </div>);
   }
 }
