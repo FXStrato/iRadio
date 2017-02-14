@@ -83,7 +83,7 @@ class Room extends Component {
           }
         });
       }
-      else{
+      else {
         this.setState({userID: null}); //null out the saved state
         this.setState({userEmail: null})
       }
@@ -148,13 +148,9 @@ class Room extends Component {
                   <Col s={12}>
                     <h1 className="center-align flow-text">Now Playing</h1>
                   </Col>
-                  {!isMobile.any() ?
-                    <Col s={12}>
-                    <RadioPlayer room={this.props.params.roomID} isOwner={this.state.isOwner} />
-                  </Col> :
-                    <Col s={12}>
-                      <div>Currently disabled for mobile, but you can still add to queue!</div>
-                    </Col>}
+                  <Col s={12}>
+                    <RadioPlayer isMobile={isMobile.any()} room={this.props.params.roomID} isOwner={this.state.isOwner} />
+                  </Col>
                 </Row>
               </div>
             </Tab>

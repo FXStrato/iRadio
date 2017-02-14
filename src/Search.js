@@ -120,24 +120,6 @@ class Search extends Component {
     })
   }
 
-  //Recursive call to ensure fetches are in the proper order. Slower... but no errors so far.
-  getDurations = (items, index, array) => {
-    if(index >= items.length) {
-      this.setState({durations: array});
-      this.setState({finished: true});
-      document.querySelector('#list-progress').style.display = 'none';
-      return array;
-    } else {
-      fetch('https://www.googleapis.com/youtube/v3/videos?id=' + items[index].id.videoId + '&part=contentDetails&key=' + this.props.apiKey)
-      .then(res => {
-        res.json().then(data => {
-          array.push(ytDurationFormat(data.items[0].contentDetails.duration));
-          this.getDurations(items, index+=1, array);
-        })
-      })
-    }
-  }
-
   handleOpen = result => {
     this.setState({song: result});
     let text = <div>

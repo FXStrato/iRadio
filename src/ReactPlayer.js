@@ -16,7 +16,8 @@ class RadioPlayer extends React.Component {
       {
         nowPlaying:null,
         queue:{},
-        volume: 0.75
+        volume: 0.75,
+        isOwner: this.props.isOwner
       };
   }
 
@@ -76,28 +77,27 @@ class RadioPlayer extends React.Component {
 
   //handles the fast forwrd clicking and updates the firebase instance
   handleForwardClick = () => {
-    var refPath = "channels/" + this.props.room;
-    var queueRef = firebase.database().ref(refPath + "/queue");
-    var historyRef = firebase.database().ref("channels/" + this.props.room + "/history");
-    var nowPlayingRef = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
+    if(this.props.isOwner) {
+      var refPath = "channels/" + this.props.room;
+      var queueRef = firebase.database().ref(refPath + "/queue");
+      var historyRef = firebase.database().ref("channels/" + this.props.room + "/history");
+      var nowPlayingRef = firebase.database().ref("channels/" + this.props.room + "/nowPlaying");
 
-    var roomRef = firebase.database().ref(refPath);
-    //save the old now playing object
-    var oldTrack = {
-      url: this.state.nowPlaying.url,
-      baseUrl: this.state.nowPlaying.url,
-      duration: this.state.nowPlaying.duration,
-      formatduration: this.state.nowPlaying.formatduration,
-      title: this.state.nowPlaying.title,
-      thumbnail: this.state.nowPlaying.thumbnail,
-      channel: this.state.nowPlaying.channel,
-      insertTime: this.state.nowPlaying.insertTime
-    };
-    historyRef.push(oldTrack);
-
+      var roomRef = firebase.database().ref(refPath);
+      //save the old now playing object
+      var oldTrack = {
+        url: this.state.nowPlaying.url,
+        baseUrl: this.state.nowPlaying.url,
+        duration: this.state.nowPlaying.duration,
+        formatduration: this.state.nowPlaying.formatduration,
+        title: this.state.nowPlaying.title,
+        thumbnail: this.state.nowPlaying.thumbnail,
+        channel: this.state.nowPlaying.channel,
+        insertTime: this.state.nowPlaying.insertTime
+      };
+      historyRef.push(oldTrack);
     //get the object at the front of the queue
     //This is where it pulls from queue. Only do this if the person is owner.
-    if(this.props.isOwner) {
       var newTrack = null;
       queueRef.orderByKey().limitToFirst(1)
         .once("value", (snapshot) => {
@@ -267,36 +267,40 @@ class RadioPlayer extends React.Component {
       title = this.state.nowPlaying.title
     }
 
-    return (<div>
-      <div className="row">
-        {content}
-        <div className="col s12 center-align">
-          <h1 className="flow-text">{title}</h1>
-        </div>
-        {this.state.nowPlaying !== null && !this.state.nowPlaying.isPlaying  ?
-          <div className="col s12 center-align red-text text-lighten-2">
-            Video is currently paused
-          </div>
-        :
-        <div className="col s12 center-align red-text text-lighten-2" style={{visibility: 'hidden'}}>
-          Video is currently paused
-        </div>}
-      </div>
-      {this.state.nowPlaying !== null &&
+    return (
+      <div>
         <div className="row">
-          <div className="col s12">
-            <PlaybackControls
-              isOwner={this.props.isOwner}
-              isPlaying={isPlaying}
-              playPauseCallback={this.handlePlayPauseClick}
-              forwardCallback={this.handleForwardClick}
-              backwardCallback={this.handleBackwardClick}
-              volumeCallback={this.handleVolumeChange}
-            />
+          {!this.props.isMobile &&
+            content
+          }
+          <div className="col s12 center-align">
+            <h1 className="flow-text">{title}</h1>
           </div>
+          {this.state.nowPlaying !== null && !this.state.nowPlaying.isPlaying  ?
+            <div className="col s12 center-align red-text text-lighten-2">
+              Video is currently paused
+            </div>
+          :
+          <div className="col s12 center-align red-text text-lighten-2" style={{visibility: 'hidden'}}>
+            Video is currently paused
+          </div>}
         </div>
-      }
-    </div>);
+        {this.state.nowPlaying !== null &&
+          <div className="row">
+            <div className="col s12">
+              <PlaybackControls
+                isOwner={this.props.isOwner}
+                isPlaying={isPlaying}
+                playPauseCallback={this.handlePlayPauseClick}
+                forwardCallback={this.handleForwardClick}
+                backwardCallback={this.handleBackwardClick}
+                volumeCallback={this.handleVolumeChange}
+              />
+            </div>
+          </div>
+        }
+    </div>
+    );
   }
 }
 
