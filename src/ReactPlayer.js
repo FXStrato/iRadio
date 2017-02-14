@@ -95,6 +95,7 @@ class RadioPlayer extends React.Component {
     };
     historyRef.push(oldTrack);
 
+
     //get the object at the front of the queue
     //This is where it pulls from queue. Only do this if the person is owner.
     if(this.props.isOwner) {
@@ -264,7 +265,7 @@ class RadioPlayer extends React.Component {
           />
         </div>
       isPlaying = this.state.nowPlaying.isPlaying;
-      title = this.state.nowPlaying.title
+      title = this.state.nowPlaying.title;
     }
 
     return (<div>
@@ -272,6 +273,8 @@ class RadioPlayer extends React.Component {
         {content}
         <div className="col s12 center-align">
           <h1 className="flow-text">{title}</h1>
+
+
         </div>
         {this.state.nowPlaying !== null && !this.state.nowPlaying.isPlaying  ?
           <div className="col s12 center-align red-text text-lighten-2">
@@ -315,13 +318,49 @@ class VideoContainer extends React.Component {
         onProgress={this.props.onProgress}
         onDuration={this.props.onDuration}
         onEnded={this.props.onVideoEnd}
-        progressFrequency={500}
+        progressFrequency={1000}
         played={this.props.nowPlaying.progress}
         volume={this.props.volume}
         controls={false}
       />);
   }
 }
+
+class ProgressDuration extends React.Component {
+
+  //renders the video container
+  render() {
+    return (
+      <ReactPlayer
+        style={{pointerEvents: 'none'}}
+        className="responsive-video, z-depth-1"
+        width={'100%'}
+        playing={this.props.nowPlaying.isPlaying}
+        url={this.props.url}
+        onProgress={this.props.onProgress}
+        onDuration={this.props.onDuration}
+        onEnded={this.props.onVideoEnd}
+        progressFrequency={1000}
+        played={this.props.nowPlaying.progress}
+        volume={this.props.volume}
+        controls={false}
+      />);
+  }
+
+  getCurrentSecond(position, duration) {
+    return (duration) * (1.0 * position);
+  }
+
+  convertSecToMin(sec) {
+    var min = sec / 60;
+    sec = sec % 60;
+    if (sec < 10) {
+        sec = "0" + sec;
+    }
+    return min + ":" + sec;
+  }  
+}
+
 
 //Playback controls for the Radio Player
 class PlaybackControls extends React.Component {
