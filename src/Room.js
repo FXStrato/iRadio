@@ -145,25 +145,18 @@ class Room extends Component {
               <div className="container">
                 <Row>
                   <br/>
-                  <Col s={12}>
+                  <Col s={12} m={6}>
                     <h1 className="center-align flow-text">Now Playing</h1>
-                  </Col>
-                  <Col s={12}>
                     <RadioPlayer isMobile={isMobile.any()} room={this.props.params.roomID} isOwner={this.state.isOwner} />
                   </Col>
-                </Row>
-              </div>
-            </Tab>
-            <Tab label={<span className="tab-names">Queue</span>}  value={1} style={{backgroundColor: '#424242', color: '#fff'}}>
-              <div className="container">
-                <Row>
-                  <Col s={12}>
+                  <Col s={12} m={6}>
                     <h1 className="flow-text center-align">Queue</h1>
                     <SongList room={this.props.params.roomID} user={this.state.userID} isOwner={this.state.isOwner} listType="queue"/>
                   </Col>
                 </Row>
               </div>
             </Tab>
+            
             <Tab label={<span className="tab-names">Search</span>} value={2} style={{backgroundColor: '#424242', color: '#fff'}}>
               <div className="container">
                 <Row>

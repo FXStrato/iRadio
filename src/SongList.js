@@ -4,7 +4,7 @@ import {Col} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-import {List, ListItem, Dialog, FlatButton, Avatar} from 'material-ui';
+import {List, ListItem, Dialog, FlatButton} from 'material-ui';
 import firebase from 'firebase';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
@@ -84,8 +84,8 @@ class SongList extends React.Component {
       content = <ListItem
         style={{backgroundColor: '#1F1F1F', border: '1px #373737 solid', paddingBottom: '10px'}}
         key={song.key}
-        leftAvatar={<Avatar size={50} src={song.thumbnail}/>}
-        rightIcon={this.props.isOwner ? <DeleteIcon style={{cursor: 'pointer', marginTop: '20px'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />: <span></span>}
+        leftAvatar={<img src={song.thumbnail} className="responsive-img" width={50} alt={song.title}/>}
+        rightIcon={this.props.isOwner ? <DeleteIcon style={{cursor: 'pointer'}} onTouchTap={() => this.handleOpen(song.key, song.title)} color={'#C2185B'} />: <span></span>}
         primaryText={song.title}
         secondaryText={song.channel + ' | ' + song.formatduration}
         disabled={true}
@@ -123,13 +123,13 @@ class SongList extends React.Component {
         {this.state.queue.length >= 2 && this.props.isOwner &&
           <Col s={12}>
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-              <FlatButton style={{float: 'right'}} backgroundColor={'#C2185B'} label="Delete All" onTouchTap={this.handleDeleteOpen}/>
+              <FlatButton style={{float: 'right', marginTop: -50, marginBottom: 10}} backgroundColor={'#C2185B'} label="Delete All" onTouchTap={this.handleDeleteOpen}/>
             </MuiThemeProvider>
           </Col>
         }
         <Col s={12}>
           <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-          <List>
+          <List style={{height: 552, overflowY: 'auto'}}>
             {songList}
           </List>
           </MuiThemeProvider>

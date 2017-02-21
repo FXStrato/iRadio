@@ -92,8 +92,9 @@ class App extends Component {
   render() {
     let dialogText = '';
     let dialogTitle = '';
+    let room = '';
     if(hashHistory.getCurrentLocation().pathname.indexOf('/room') !== -1) {
-
+      room = hashHistory.getCurrentLocation().pathname.split('/')[2];
     }
 
     const actions = [
@@ -114,6 +115,7 @@ class App extends Component {
                       <img style={{float: 'left', width: '50px', height: '50px'}} src={mainIcon} alt="Network by Dmitry Mirolyubov from the Noun Project"/>
                       <span className="flow-text">iRadio</span>
                     </FlatButton>
+                    {room && <div>Currently in room : {room}</div>}
                   </ToolbarGroup>
                   <ToolbarGroup>
                     <IconMenu

@@ -323,7 +323,8 @@ class PlaybackControls extends React.Component {
             </div>
           </div>
           }
-          <div className="col s2 right">
+          {!this.props.isMobile &&
+            <div className="col s2 right">
             <VolumeIcon style={{marginTop: -60, float: 'left', opacity: 0.5}}/>
             <Slider
               defaultValue={0.75}
@@ -332,6 +333,8 @@ class PlaybackControls extends React.Component {
               onChange={this.props.volumeCallback}
             />
           </div>
+        }
+
       </div>
     );
   }

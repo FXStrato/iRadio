@@ -6,7 +6,7 @@ import JSONP from 'jsonp';
 import YoutubeFinder from 'youtube-finder';
 import {Link, hashHistory} from 'react-router';
 import {Row, Col} from 'react-materialize';
-import {RaisedButton, FlatButton, Dialog, TextField, List, ListItem, AutoComplete, CircularProgress, Avatar} from 'material-ui';
+import {RaisedButton, FlatButton, Dialog, TextField, List, ListItem, AutoComplete, CircularProgress} from 'material-ui';
 import _ from 'lodash';
 import ytDurationFormat from 'youtube-duration-format';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -129,7 +129,7 @@ class Search extends Component {
           <ListItem
             disabled={true}
             key={'dialog-'+result.url}
-            leftAvatar={<Avatar size={50} src={result.thumbnail}/>}
+            leftAvatar={<img src={result.thumbnail} className="responsive-img" width={50} alt={result.title}/>}
             primaryText={result.title}
             secondaryText={result.channel + ' | ' + result.duration}
             secondaryTextLines={2}
@@ -147,7 +147,7 @@ class Search extends Component {
 
   handleSubmit = (result) => {
     //Add song to firebase. Should be attached to add to queue button
-    let song = result;
+    let song = this.state.song;
     this.roomRef = firebase.database().ref('channels/' + this.props.room + '/queue');
     let item = {
       duration: this.convertToSeconds(song.duration),
@@ -158,7 +158,7 @@ class Search extends Component {
       thumbnail: song.thumbnail,
       insertTime: firebase.database.ServerValue.TIMESTAMP
     }
-    this.roomRef.push(item);
+    this.roomRef.push(item).off();
     this.setState({open: false, inputValue: ''});
     this.props.callback(song.title);
   }
@@ -183,10 +183,10 @@ class Search extends Component {
         let temp = {url: ytURL + elem.id.videoId, title: elem.snippet.title, duration: this.state.durations[index], channel:elem.snippet.channelTitle, thumbnail: elem.snippet.thumbnails.high.url};
         return <ListItem
           // onTouchTap={() => this.handleOpen(temp)}
-          onTouchTap={() => this.handleSubmit(temp)}
+          onTouchTap={() => this.handleOpen(temp)}
           style={{backgroundColor: '#1F1F1F', border: '1px #373737 solid'}}
           key={elem.id.videoId}
-          leftAvatar={<Avatar size={50} src={elem.snippet.thumbnails.high.url}/>}
+          leftAvatar={<img src={elem.snippet.thumbnails.high.url} className="responsive-img" width={60} alt={elem.snippet.title}/>}
           primaryText={<span style={{marginLeft: '10px'}}>{elem.snippet.title}</span>}
           secondaryText={<span style={{marginLeft: '10px'}}>{this.state.durations[index] ? elem.snippet.channelTitle + ' | ' + this.state.durations[index] : elem.snippet.channelTitle + ' |  Loading...'}</span>}
           secondaryTextLines={2}
