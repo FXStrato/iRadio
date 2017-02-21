@@ -186,9 +186,9 @@ class Search extends Component {
           onTouchTap={() => this.handleOpen(temp)}
           style={{backgroundColor: '#1F1F1F', border: '1px #373737 solid'}}
           key={elem.id.videoId}
-          leftAvatar={<img src={elem.snippet.thumbnails.high.url} className="responsive-img" width={60} alt={elem.snippet.title}/>}
-          primaryText={<span style={{marginLeft: '10px'}}>{elem.snippet.title}</span>}
-          secondaryText={<span style={{marginLeft: '10px'}}>{this.state.durations[index] ? elem.snippet.channelTitle + ' | ' + this.state.durations[index] : elem.snippet.channelTitle + ' |  Loading...'}</span>}
+          leftAvatar={<img src={elem.snippet.thumbnails.high.url} className="responsive-img" width={50} alt={elem.snippet.title}/>}
+          primaryText={<span>{elem.snippet.title}</span>}
+          secondaryText={<span>{this.state.durations[index] ? elem.snippet.channelTitle + ' | ' + this.state.durations[index] : elem.snippet.channelTitle + ' |  Loading...'}</span>}
           secondaryTextLines={2}
         />
       });
