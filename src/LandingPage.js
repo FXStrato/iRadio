@@ -217,7 +217,7 @@ componentWillUnmount() {
           <Col s={12} m={6} l={6}>
             <h1>Welcome to iRadio!</h1>
             <div className="flow-text">
-              Queue songs to play, add songs to a friend's room, or make your own room in iRadio!
+              Queue songs to play, add songs to a friend's room, or make your own room in iRadio! Join your friend's room through their Room ID.
             </div>
             <br/>
             <div>
