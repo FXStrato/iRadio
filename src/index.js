@@ -15,12 +15,13 @@ injectTapEventPlugin();
 // Needed for users joining in the middle of a song
 localStorage.setItem("updated", JSON.stringify(false));
 
+// Initialize Firebase
 var config = {
-  apiKey: "AIzaSyBVGyJq21xT2zRpbNMqBAtvq9haT7gMI08",
-  authDomain: "iradio-614db.firebaseapp.com",
-  databaseURL: "https://iradio-614db.firebaseio.com",
-  storageBucket: "iradio-614db.appspot.com",
-  messagingSenderId: "552716146199"
+  apiKey: "AIzaSyBMndQIkM87gzotseHEbGs72_gCCgKs88k",
+  authDomain: "iradio-e3e09.firebaseapp.com",
+  databaseURL: "https://iradio-e3e09.firebaseio.com",
+  storageBucket: "iradio-e3e09.appspot.com",
+  messagingSenderId: "701096491094"
 };
 firebase.initializeApp(config);
 

@@ -6,6 +6,7 @@ import firebase from 'firebase';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ForwardIcon from 'material-ui/svg-icons/av/fast-forward';
+import VolumeIcon from 'material-ui/svg-icons/av/volume-up';
 
 //RadioPlayer componenet that has both the video container and the playback controls
 class RadioPlayer extends React.Component {
@@ -140,56 +141,22 @@ class RadioPlayer extends React.Component {
     }
   }
 
-  //for now, resets the queue
-  handleBackwardClick = () => {
-    //TODO let's implement this last
-
-    var reset = {
-      key: "evanTest",
-      nowPlaying: {
-        baseUrl: "https://www.youtube.com/watch?v=phn2JZ2xTz4",
-        url: "https://www.youtube.com/watch?v=phn2JZ2xTz4",
-        duration: 241,
-        title: "save our souls",
-        progress:0,
-        isPlaying:true
-      },
-      queue: {
-        songId1: {
-          url: "https://www.youtube.com/watch?v=Zasx9hjo4WY",
-          title: "zedd ignite",
-          duration: 227
-        },
-        songId2: {
-          url: "https://www.youtube.com/watch?v=B7xai5u_tnk",
-          title: "fatrat monody",
-          duration: 290
-        },
-        songId3: {
-          url: "https://www.youtube.com/watch?v=dXHVuIqGzSU",
-          title: "aftergold big wild",
-          duration: 230
-        }
-      }
-    };
-
-    var queueRef = firebase.database().ref("channels/" + this.props.room);
-    queueRef.set(reset);
-
-  };
 
   //updates the state and firebase with each 'onProgress' call made by the react-player to make sure any joining users are up to date with the player
   onProgress = state => {
-    // We only want to update time slider if we are not currently seeking
-    if (!this.state.seeking) {
-      if(state.hasOwnProperty("played")){
-        if(this.state.nowPlaying.progress - state["played"] > 0.05) {
-          this.forceUpdate();
-        } else {
-          var newNowPlayingState = this.state.nowPlaying;
-          newNowPlayingState.progress = state["played"];
-          this.setState(newNowPlayingState);
-          firebase.database().ref("channels/"+ this.props.room +"/nowPlaying").set(newNowPlayingState);
+    //Only have owner updating progress
+    if(this.props.isOwner) {
+      // We only want to update time slider if we are not currently seeking
+      if (!this.state.seeking) {
+        if(state.hasOwnProperty("played")){
+          if(this.state.nowPlaying.progress - state["played"] > 0.05) {
+            this.forceUpdate();
+          } else {
+            var newNowPlayingState = this.state.nowPlaying;
+            newNowPlayingState.progress = state["played"];
+            this.setState(newNowPlayingState);
+            firebase.database().ref("channels/"+ this.props.room +"/nowPlaying").set(newNowPlayingState);
+          }
         }
       }
     }
@@ -357,6 +324,7 @@ class PlaybackControls extends React.Component {
           </div>
           }
           <div className="col s2 right">
+            <VolumeIcon style={{marginTop: -60, float: 'left', opacity: 0.5}}/>
             <Slider
               defaultValue={0.75}
               axis={'y'}
