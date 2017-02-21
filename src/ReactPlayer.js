@@ -315,7 +315,7 @@ class PlaybackControls extends React.Component {
                   onTouchTap={this.props.playPauseCallback}
                 />
                 <BottomNavigationItem
-                  label="Forward"
+                  label="Skip"
                   icon={<ForwardIcon hoverColor="#039BE5"/>}
                   onTouchTap={this.props.forwardCallback}
                 />
